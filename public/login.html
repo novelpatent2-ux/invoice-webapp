@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — NPS Invoice Generator</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font-family:Arial,Helvetica,sans-serif; background:#0F1E38;
+  }
+  .card{
+    background:#fff; border-radius:10px; padding:36px 34px; width:100%; max-width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  }
+  h1{font-size:19px; margin:0 0 6px; color:#173A68;}
+  p.sub{font-size:13px; color:#5B6472; margin:0 0 22px;}
+  label{display:block; font-size:11.5px; font-weight:700; color:#5B6472; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.03em;}
+  input{
+    width:100%; padding:10px 12px; border:1px solid #C7CFDA; border-radius:6px;
+    font-size:14px; margin-bottom:14px;
+  }
+  button{
+    width:100%; padding:11px; border:none; border-radius:6px; background:#173A68; color:#fff;
+    font-weight:700; font-size:14px; cursor:pointer;
+  }
+  button:hover{background:#122B50;}
+  .error{color:#A13D2C; font-size:13px; margin:-6px 0 14px; display:none;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Invoice Generator</h1>
+    <p class="sub">Enter your password to continue.</p>
+    <div class="error" id="errorMsg">Incorrect password. Try again.</div>
+    <form id="loginForm">
+      <label>Password</label>
+      <input type="password" id="password" autofocus required>
+      <button type="submit">Log in</button>
+    </form>
+  </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const password = document.getElementById('password').value;
+  const errorMsg = document.getElementById('errorMsg');
+  errorMsg.style.display = 'none';
+  try{
+    const res = await fetch('/api/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password })
+    });
+    if (res.ok){
+      window.location.href = '/';
+    } else {
+      errorMsg.style.display = 'block';
+    }
+  } catch(err){
+    errorMsg.textContent = 'Something went wrong — try again.';
+    errorMsg.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

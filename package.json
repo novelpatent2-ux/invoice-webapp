@@ -1,0 +1,17 @@
+{
+  "name": "nps-invoice-generator",
+  "version": "1.0.0",
+  "description": "Password-protected invoice & estimate generator with a shared database, so your data follows you across every device.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "pg": "^8.11.5"
+  }
+}

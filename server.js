@@ -40,6 +40,13 @@ async function ensureTable() {
 }
 
 app.use(express.json({ limit: '10mb' })); // invoices can include base64 logo/signature images
+
+// Render (and most hosting platforms) sit behind a reverse proxy that
+// terminates HTTPS. Without this line, Express doesn't realize the
+// original connection was secure, which breaks "secure" session cookies
+// and causes the login to silently fail to persist.
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,

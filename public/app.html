@@ -314,7 +314,7 @@
   /* ---------- PRINT ---------- */
   @media print{
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
-    .sidebar,.toolbar,.add-row-btn,.row-remove,.toast,.modal-overlay{display:none !important;}
+    .sidebar,.toolbar,.add-row-btn,.row-remove,.toast,.modal-overlay,.no-print{display:none !important;}
     html,body{height:auto !important;overflow:visible !important;}
     .app{display:block !important;height:auto !important;overflow:visible !important;}
     .main{height:auto !important;overflow:visible !important;}
@@ -410,6 +410,11 @@
         <div class="parties-box">
           <div class="party">
             <div class="party-label">BILL TO</div>
+            <div class="no-print" style="margin-bottom:6px;">
+              <select id="clientPicker" style="width:100%;padding:6px;border:1px solid var(--border-light);border-radius:4px;font-size:12px;">
+                <option value="">+ New client</option>
+              </select>
+            </div>
             <input class="name-field" id="toName" placeholder="Client name">
             <textarea id="toDetails" placeholder="Client address"></textarea>
           </div>
@@ -454,6 +459,10 @@
           <textarea id="notesField" placeholder="Optional additional notes"></textarea>
         </div>
 
+        <div class="no-print" id="bankSelectRow" style="margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+          <label style="font-size:11px;font-weight:700;color:var(--navy);">Bank account for this invoice:</label>
+          <select id="bankAccountSelect" style="padding:5px;border:1px solid var(--border-light);border-radius:4px;font-size:12px;"></select>
+        </div>
         <div class="remit-title" id="remitTitleEl">REMITTANCE DETAILS</div>
         <div class="remit-box" id="remitBox">
           <div class="remit-sub">BANK TRANSFER</div>
@@ -562,45 +571,9 @@
       <input id="cmpSignatory" type="text" placeholder="Murali Krisha Pattabhi">
     </div>
 
-    <h3>Bank / remittance details</h3>
-    <div class="field-row">
-      <div class="field-group">
-        <label>Account name</label>
-        <input id="bankAccountName" type="text">
-      </div>
-      <div class="field-group">
-        <label>Bank</label>
-        <input id="bankName" type="text">
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field-group">
-        <label>Routing (RTIN)</label>
-        <input id="bankRouting" type="text">
-      </div>
-      <div class="field-group">
-        <label>Account #</label>
-        <input id="bankAccountNum" type="text">
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field-group">
-        <label>Account type</label>
-        <input id="bankAccountType" type="text" placeholder="Checking">
-      </div>
-      <div class="field-group">
-        <label>Swift code (optional)</label>
-        <input id="bankSwift" type="text">
-      </div>
-    </div>
-    <div class="field-group">
-      <label>Mailing address</label>
-      <textarea id="bankMailing" placeholder="8931 Drysdale River Rd, Cypress, TX 77433, USA"></textarea>
-    </div>
-    <div class="field-group">
-      <label>Zelle email (optional)</label>
-      <input id="bankZelle" type="text" placeholder="you@company.com">
-    </div>
+    <h3>Bank accounts</h3>
+    <div id="bankAccountsContainer"></div>
+    <button class="upload-btn" id="addBankAccountBtn" type="button" style="margin-bottom:16px;">+ Add bank account</button>
 
     <div class="modal-actions">
       <button class="btn" id="cancelCompanyModal">Cancel</button>
@@ -631,14 +604,21 @@
     logo:DEFAULT_LOGO,
     signature:DEFAULT_SIGNATURE,
     signatoryName:'Murali Krisha Pattabhi',
-    bankAccountName:'Novel Patent Services LLC',
-    bankName:'Bank of America',
-    bankRouting:'111000025',
-    bankAccountNum:'4881 3582 2791',
-    bankAccountType:'Checking',
-    bankSwift:'BOFAUS3N',
-    bankMailing:'8931 Drysdale River Rd, Cypress, TX 77433, USA',
-    bankZelle:'surya@novelpatent.com'
+    bankAccounts:[
+      {
+        id:'acct_default',
+        label:'Primary Account',
+        accountName:'Novel Patent Services LLC',
+        bankName:'Bank of America',
+        routing:'111000025',
+        accountNum:'4881 3582 2791',
+        accountType:'Checking',
+        swift:'BOFAUS3N',
+        mailing:'8931 Drysdale River Rd, Cypress, TX 77433, USA',
+        zelle:'surya@novelpatent.com'
+      }
+    ],
+    defaultBankAccountId:'acct_default'
   };
 
   // ---------- VIEW SWITCHING ----------
@@ -771,9 +751,11 @@
   let company = null;
   let invoices = [];
   let estimates = [];
+  let clients = [];
   let docType = 'invoice'; // 'invoice' | 'estimate' — which kind of document is currently active
   let currentId = null;
   let items = [];
+  let currentBankAccountId = null;
 
   function toast(msg){
     const t = $('toast');
@@ -865,6 +847,43 @@
       if (est && est.value){ estimates = JSON.parse(est.value); }
     }catch(e){ estimates = []; }
 
+    try{
+      const cl = await window.storage.get('clients', false);
+      if (cl && cl.value){ clients = JSON.parse(cl.value); }
+    }catch(e){ clients = []; }
+
+    // Migrate old single bank-account fields (bankAccountName, bankName, ...)
+    // into the new bankAccounts array — never lose an existing saved account.
+    if (!company.bankAccounts || !company.bankAccounts.length){
+      if (company.bankAccountName || company.bankName || company.bankAccountNum){
+        const migrated = {
+          id: 'acct_' + Date.now(),
+          label: 'Primary Account',
+          accountName: company.bankAccountName || '',
+          bankName: company.bankName || '',
+          routing: company.bankRouting || '',
+          accountNum: company.bankAccountNum || '',
+          accountType: company.bankAccountType || '',
+          swift: company.bankSwift || '',
+          mailing: company.bankMailing || '',
+          zelle: company.bankZelle || ''
+        };
+        company.bankAccounts = [migrated];
+        company.defaultBankAccountId = migrated.id;
+      } else {
+        company.bankAccounts = [{
+          id: 'acct_' + Date.now(),
+          label: 'Primary Account',
+          accountName:'', bankName:'', routing:'', accountNum:'',
+          accountType:'', swift:'', mailing:'', zelle:''
+        }];
+        company.defaultBankAccountId = company.bankAccounts[0].id;
+      }
+    }
+    if (!company.defaultBankAccountId){
+      company.defaultBankAccountId = company.bankAccounts[0].id;
+    }
+
     if (!loadedCompany){
       await persistCompany();
     }
@@ -883,6 +902,10 @@
   async function persistEstimates(){
     try{ await window.storage.set('estimates', JSON.stringify(estimates), false); }
     catch(e){ toast('Could not save — try again'); }
+  }
+  async function persistClients(){
+    try{ await window.storage.set('clients', JSON.stringify(clients), false); }
+    catch(e){ toast('Could not save client list'); }
   }
 
   // ---------- BRAND / LEDGER ----------
@@ -1009,17 +1032,35 @@
   }
 
   // ---------- REMITTANCE RENDER ----------
+  function getCurrentBankAccount(){
+    const accts = (company && company.bankAccounts) || [];
+    if (!accts.length) return null;
+    return accts.find(a => a.id === currentBankAccountId) || accts[0];
+  }
+
+  function renderBankAccountSelect(){
+    const sel = $('bankAccountSelect');
+    const accts = (company && company.bankAccounts) || [];
+    sel.innerHTML = accts.map(a => `<option value="${escapeAttr(a.id)}">${escapeAttr(a.label || a.bankName || 'Account')}</option>`).join('');
+    $('bankSelectRow').style.display = accts.length > 1 ? '' : 'none';
+    if (!currentBankAccountId || !accts.some(a=>a.id===currentBankAccountId)){
+      currentBankAccountId = (company && company.defaultBankAccountId) || (accts[0] && accts[0].id) || null;
+    }
+    sel.value = currentBankAccountId || '';
+  }
+
   function renderRemit(){
-    $('remitAccountName').textContent = company.bankAccountName || '';
-    $('remitBank').textContent = company.bankName || '';
-    $('remitRouting').textContent = company.bankRouting || '';
-    $('remitAccountNum').textContent = company.bankAccountNum || '';
-    $('remitAccountType').textContent = company.bankAccountType || '';
-    $('remitSwift').textContent = company.bankSwift || '';
-    $('remitSwiftRow').style.display = company.bankSwift ? '' : 'none';
-    $('remitMailing').textContent = company.bankMailing || '';
-    $('remitZelleEmail').textContent = company.bankZelle || '';
-    $('remitZelleRow').style.display = company.bankZelle ? '' : 'none';
+    const acct = getCurrentBankAccount() || {};
+    $('remitAccountName').textContent = acct.accountName || '';
+    $('remitBank').textContent = acct.bankName || '';
+    $('remitRouting').textContent = acct.routing || '';
+    $('remitAccountNum').textContent = acct.accountNum || '';
+    $('remitAccountType').textContent = acct.accountType || '';
+    $('remitSwift').textContent = acct.swift || '';
+    $('remitSwiftRow').style.display = acct.swift ? '' : 'none';
+    $('remitMailing').textContent = acct.mailing || '';
+    $('remitZelleEmail').textContent = acct.zelle || '';
+    $('remitZelleRow').style.display = acct.zelle ? '' : 'none';
 
     const logoSlot = $('logoSlot');
     if (company.logo){
@@ -1113,14 +1154,18 @@
     $('fromDetails').value = company.details || '';
     $('toName').value = '';
     $('toDetails').value = '';
+    $('clientPicker').value = '';
     $('poField').value = company.defaultPO || '';
     $('notesField').value = '';
     setStatusOptions(type);
     $('statusSelect').value = 'Draft';
     $('amountPaidField').value = 0;
     $('toolbarTitle').textContent = type === 'invoice' ? 'New invoice' : 'New estimate';
+    currentBankAccountId = (company && company.defaultBankAccountId) || null;
     applyDocTypeUI();
     renderItems();
+    renderClientPicker();
+    renderBankAccountSelect();
     renderRemit();
     recalcTotals();
     renderLedger();
@@ -1146,8 +1191,12 @@
     $('statusSelect').value = doc.status;
     $('amountPaidField').value = doc.amountPaid || 0;
     $('toolbarTitle').textContent = doc.number;
+    $('clientPicker').value = '';
+    currentBankAccountId = doc.bankAccountId || (company && company.defaultBankAccountId) || null;
     applyDocTypeUI();
     renderItems();
+    renderClientPicker();
+    renderBankAccountSelect();
     renderRemit();
     recalcTotals();
     renderLedger();
@@ -1172,6 +1221,7 @@
     };
     if (docType === 'invoice'){
       base.amountPaid = parseFloat($('amountPaidField').value)||0;
+      base.bankAccountId = currentBankAccountId || (company && company.defaultBankAccountId) || null;
     }
     return base;
   }
@@ -1193,10 +1243,33 @@
       await persistCompany();
     }
     if (docType === 'invoice'){ await persistInvoices(); } else { await persistEstimates(); }
+    await upsertClientFromCurrent();
     $('toolbarTitle').textContent = doc.number;
     applyDocTypeUI(); // Convert button may now appear since this document is saved
     renderLedger();
     toast(docType === 'invoice' ? 'Invoice saved' : 'Estimate saved');
+  }
+
+  async function upsertClientFromCurrent(){
+    const name = $('toName').value.trim();
+    if (!name) return;
+    const details = $('toDetails').value;
+    const existing = clients.find(c => (c.name||'').trim().toLowerCase() === name.toLowerCase());
+    if (existing){
+      existing.details = details;
+      existing.updatedAt = Date.now();
+    } else {
+      clients.push({ id: uid(), name, details, updatedAt: Date.now() });
+    }
+    await persistClients();
+    renderClientPicker();
+  }
+
+  function renderClientPicker(){
+    const sel = $('clientPicker');
+    const sorted = clients.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+    sel.innerHTML = '<option value="">+ New client</option>' +
+      sorted.map(c => `<option value="${escapeAttr(c.id)}">${escapeAttr(c.name)}</option>`).join('');
   }
 
   async function deleteDocument(){
@@ -1279,14 +1352,9 @@
     $('cmpEstNextNumber').value = company.estNextNumber||1;
     $('cmpDefaultPO').value = company.defaultPO||'';
     $('cmpSignatory').value = company.signatoryName||'';
-    $('bankAccountName').value = company.bankAccountName||'';
-    $('bankName').value = company.bankName||'';
-    $('bankRouting').value = company.bankRouting||'';
-    $('bankAccountNum').value = company.bankAccountNum||'';
-    $('bankAccountType').value = company.bankAccountType||'';
-    $('bankSwift').value = company.bankSwift||'';
-    $('bankMailing').value = company.bankMailing||'';
-    $('bankZelle').value = company.bankZelle||'';
+
+    $('bankAccountsContainer').innerHTML = '';
+    (company.bankAccounts||[]).forEach(acct => addBankAccountCard(acct));
 
     modalLogo = company.logo || null;
     modalSignature = company.signature || null;
@@ -1307,24 +1375,106 @@
     company.estNextNumber = parseInt($('cmpEstNextNumber').value)||1;
     company.defaultPO = $('cmpDefaultPO').value;
     company.signatoryName = $('cmpSignatory').value;
-    company.bankAccountName = $('bankAccountName').value;
-    company.bankName = $('bankName').value;
-    company.bankRouting = $('bankRouting').value;
-    company.bankAccountNum = $('bankAccountNum').value;
-    company.bankAccountType = $('bankAccountType').value;
-    company.bankSwift = $('bankSwift').value;
-    company.bankMailing = $('bankMailing').value;
-    company.bankZelle = $('bankZelle').value;
+
+    const cards = $('bankAccountsContainer').querySelectorAll('.bank-account-card');
+    const newAccounts = [];
+    cards.forEach(card => {
+      newAccounts.push({
+        id: card.dataset.id,
+        label: card.querySelector('.ba-label').value.trim() || 'Bank account',
+        accountName: card.querySelector('.ba-accountName').value,
+        bankName: card.querySelector('.ba-bankName').value,
+        routing: card.querySelector('.ba-routing').value,
+        accountNum: card.querySelector('.ba-accountNum').value,
+        accountType: card.querySelector('.ba-accountType').value,
+        swift: card.querySelector('.ba-swift').value,
+        mailing: card.querySelector('.ba-mailing').value,
+        zelle: card.querySelector('.ba-zelle').value
+      });
+    });
+    if (newAccounts.length){
+      company.bankAccounts = newAccounts;
+      if (!newAccounts.some(a=>a.id===company.defaultBankAccountId)){
+        company.defaultBankAccountId = newAccounts[0].id;
+      }
+    }
+
     company.logo = modalLogo;
     company.signature = modalSignature;
     if (!company.currencyWords) company.currencyWords = 'US Dollars';
 
     await persistCompany();
     renderBrand();
+    renderBankAccountSelect();
     renderRemit();
     recalcTotals();
     closeCompanyModal();
     toast('Company details saved');
+  }
+
+  function addBankAccountCard(acct){
+    acct = acct || { id: 'acct_' + Date.now() + '_' + Math.floor(Math.random()*10000), label:'', accountName:'', bankName:'', routing:'', accountNum:'', accountType:'', swift:'', mailing:'', zelle:'' };
+    const card = document.createElement('div');
+    card.className = 'bank-account-card';
+    card.dataset.id = acct.id;
+    card.style.cssText = 'border:1px solid var(--border-light);border-radius:8px;padding:14px;margin-bottom:14px;position:relative;';
+    card.innerHTML = `
+      <div class="field-row" style="align-items:center;">
+        <div class="field-group" style="flex:1;">
+          <label>Label</label>
+          <input class="ba-label" type="text" placeholder="e.g. Primary Account" value="${escapeAttr(acct.label||'')}">
+        </div>
+        <button class="remove-link ba-remove" type="button" style="margin-left:10px;">Remove</button>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Account name</label>
+          <input class="ba-accountName" type="text" value="${escapeAttr(acct.accountName||'')}">
+        </div>
+        <div class="field-group">
+          <label>Bank</label>
+          <input class="ba-bankName" type="text" value="${escapeAttr(acct.bankName||'')}">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Routing (RTIN)</label>
+          <input class="ba-routing" type="text" value="${escapeAttr(acct.routing||'')}">
+        </div>
+        <div class="field-group">
+          <label>Account #</label>
+          <input class="ba-accountNum" type="text" value="${escapeAttr(acct.accountNum||'')}">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Account type</label>
+          <input class="ba-accountType" type="text" placeholder="Checking" value="${escapeAttr(acct.accountType||'')}">
+        </div>
+        <div class="field-group">
+          <label>Swift code (optional)</label>
+          <input class="ba-swift" type="text" value="${escapeAttr(acct.swift||'')}">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Mailing address</label>
+        <textarea class="ba-mailing">${escapeAttr(acct.mailing||'')}</textarea>
+      </div>
+      <div class="field-group">
+        <label>Zelle email (optional)</label>
+        <input class="ba-zelle" type="text" placeholder="you@company.com" value="${escapeAttr(acct.zelle||'')}">
+      </div>
+    `;
+    card.querySelector('.ba-remove').addEventListener('click', ()=>{
+      const container = $('bankAccountsContainer');
+      if (container.querySelectorAll('.bank-account-card').length <= 1){
+        toast('At least one bank account is required');
+        return;
+      }
+      card.remove();
+    });
+    $('bankAccountsContainer').appendChild(card);
+    return card;
   }
 
   function handleFileInput(inputEl, onLoaded){
@@ -1389,6 +1539,21 @@
   handleFileInput($('sigFileInput'), (dataUrl)=>{ modalSignature = dataUrl; renderThumb($('sigPreview'), modalSignature, 'No signature'); });
   $('logoRemoveBtn').addEventListener('click', ()=>{ modalLogo = null; renderThumb($('logoPreview'), null, 'No logo'); });
   $('sigRemoveBtn').addEventListener('click', ()=>{ modalSignature = null; renderThumb($('sigPreview'), null, 'No signature'); });
+
+  $('bankAccountSelect').addEventListener('change', (e)=>{
+    currentBankAccountId = e.target.value;
+    renderRemit();
+  });
+  $('addBankAccountBtn').addEventListener('click', ()=>{ addBankAccountCard(); });
+  $('clientPicker').addEventListener('change', (e)=>{
+    const id = e.target.value;
+    if (!id) return; // "+ New client" — leave existing fields as-is
+    const c = clients.find(c => c.id === id);
+    if (c){
+      $('toName').value = c.name || '';
+      $('toDetails').value = c.details || '';
+    }
+  });
 
   // ---------- INIT ----------
   (async function init(){

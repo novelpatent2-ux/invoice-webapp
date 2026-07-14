@@ -233,6 +233,10 @@
   table.items tbody td{padding:8px 8px;border-bottom:1px solid var(--border-light);border-right:1px solid var(--border-light);vertical-align:top;}
   table.items tbody td.idx{text-align:center;color:var(--slate);font-size:12px;width:5%;}
   table.items tbody input{border:none;background:transparent;width:100%;font-family:Arial,sans-serif;font-size:12.5px;color:var(--ink);}
+  table.items tbody textarea.desc-field{
+    border:none;background:transparent;width:100%;font-family:Arial,sans-serif;font-size:12.5px;color:var(--ink);
+    resize:none;overflow:hidden;display:block;line-height:1.4;padding:0;margin:0;box-sizing:border-box;
+  }
   table.items tbody input.num{text-align:right;font-family:'Courier New',monospace;font-size:12.5px;}
   .amount-cell{text-align:right;font-family:'Courier New',monospace;font-size:12.5px;font-weight:700;padding-top:8px;white-space:nowrap;}
   .row-remove{background:none;border:none;color:var(--slate);cursor:pointer;font-size:14px;padding:0 4px;line-height:1;}
@@ -343,7 +347,6 @@
         </div>
       </div>
       <button class="edit-company-btn" id="openCompanyModal">Edit company details</button>
-      <button class="edit-company-btn" id="logoutBtn" style="margin-left:14px;">Log out</button>
     </div>
 
     <button class="nav-home-btn" id="homeBtn">🏠 Home</button>
@@ -607,44 +610,6 @@
 </div>
 
 <script>
-// ---------------------------------------------------------------
-// window.storage polyfill: this app now runs on its own server with
-// its own database, instead of inside Claude's artifact sandbox. This
-// object matches the same get/set/delete/list interface the rest of
-// this file already uses, so none of the invoice/estimate logic below
-// needed to change — it just now talks to our own backend + database.
-// ---------------------------------------------------------------
-window.storage = {
-  async get(key){
-    const res = await fetch('/api/storage/' + encodeURIComponent(key));
-    if (res.status === 401){ window.location.href = '/login.html'; throw new Error('not authenticated'); }
-    if (!res.ok) throw new Error('not found');
-    return res.json();
-  },
-  async set(key, value){
-    const res = await fetch('/api/storage/' + encodeURIComponent(key), {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value })
-    });
-    if (res.status === 401){ window.location.href = '/login.html'; return null; }
-    if (!res.ok) return null;
-    return res.json();
-  },
-  async delete(key){
-    const res = await fetch('/api/storage/' + encodeURIComponent(key), { method: 'DELETE' });
-    if (res.status === 401){ window.location.href = '/login.html'; return null; }
-    if (!res.ok) return null;
-    return res.json();
-  },
-  async list(prefix){
-    const res = await fetch('/api/storage?prefix=' + encodeURIComponent(prefix || ''));
-    if (res.status === 401){ window.location.href = '/login.html'; return null; }
-    if (!res.ok) return null;
-    return res.json();
-  }
-};
-
 (function(){
 
   const $ = id => document.getElementById(id);
@@ -983,6 +948,11 @@ window.storage = {
     return cleaned.length ? cleaned : [newItem()];
   }
 
+  function autoGrowDesc(el){
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
   function renderItems(){
     const body = $('itemsBody');
     body.innerHTML = '';
@@ -991,7 +961,7 @@ window.storage = {
       const amount = (parseFloat(it.price)||0) * (parseFloat(it.qty)||0);
       tr.innerHTML = `
         <td class="idx">${i+1}</td>
-        <td><input type="text" value="${escapeAttr(it.desc)}" data-field="desc" data-id="${it.id}" placeholder="Service or item description"></td>
+        <td><textarea class="desc-field" rows="1" data-field="desc" data-id="${it.id}" placeholder="Service or item description">${escapeAttr(it.desc)}</textarea></td>
         <td><input type="number" class="num" value="${it.price}" min="0" step="0.01" data-field="price" data-id="${it.id}"></td>
         <td><input type="number" class="num" value="${it.qty}" min="0" step="1" data-field="qty" data-id="${it.id}"></td>
         <td class="amount-cell">${money(amount)}</td>
@@ -1000,6 +970,10 @@ window.storage = {
       body.appendChild(tr);
     });
     body.querySelectorAll('input').forEach(inp=> inp.addEventListener('input', onItemInput));
+    body.querySelectorAll('textarea.desc-field').forEach(ta=>{
+      ta.addEventListener('input', onItemInput);
+      autoGrowDesc(ta); // size correctly for existing content on render
+    });
     body.querySelectorAll('.row-remove').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         items = items.filter(i=>i.id !== btn.dataset.id);
@@ -1020,6 +994,9 @@ window.storage = {
       const amt = (parseFloat(it.price)||0) * (parseFloat(it.qty)||0);
       row.querySelector('.amount-cell').textContent = money(amt);
       recalcTotals();
+    }
+    if (field==='desc'){
+      autoGrowDesc(e.target);
     }
   }
 
@@ -1402,10 +1379,6 @@ window.storage = {
   $('searchInput').addEventListener('input', renderLedger);
   $('brandMark').addEventListener('click', openCompanyModal);
   $('openCompanyModal').addEventListener('click', openCompanyModal);
-  $('logoutBtn').addEventListener('click', async ()=>{
-    await fetch('/api/logout', { method:'POST' });
-    window.location.href = '/login.html';
-  });
   $('cancelCompanyModal').addEventListener('click', closeCompanyModal);
   $('saveCompanyModal').addEventListener('click', saveCompanyModal);
   $('companyModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='companyModalOverlay') closeCompanyModal(); });

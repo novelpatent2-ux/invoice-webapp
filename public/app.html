@@ -583,6 +583,43 @@
 </div>
 
 <script>
+// ---------- window.storage polyfill ----------
+// This app runs as a real deployed web app (not inside the Claude artifact
+// sandbox), so window.storage isn't provided by the environment. This shim
+// gives the rest of the code the exact same get/set/delete/list interface,
+// backed by this server's /api/storage/:key routes (see server.js), which
+// persist to Postgres. Without this block, every call below silently fails.
+window.storage = {
+  async get(key, shared){
+    const res = await fetch('/api/storage/' + encodeURIComponent(key));
+    if (!res.ok){
+      let err = 'Not found';
+      try { err = (await res.json()).error || err; } catch(e){}
+      throw new Error(err);
+    }
+    return await res.json();
+  },
+  async set(key, value, shared){
+    const res = await fetch('/api/storage/' + encodeURIComponent(key), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value })
+    });
+    if (!res.ok) throw new Error('Storage set failed');
+    return await res.json();
+  },
+  async delete(key, shared){
+    const res = await fetch('/api/storage/' + encodeURIComponent(key), { method: 'DELETE' });
+    if (!res.ok) throw new Error('Storage delete failed');
+    return await res.json();
+  },
+  async list(prefix, shared){
+    const res = await fetch('/api/storage?prefix=' + encodeURIComponent(prefix || ''));
+    if (!res.ok) throw new Error('Storage list failed');
+    return await res.json();
+  }
+};
+
 (function(){
 
   const $ = id => document.getElementById(id);

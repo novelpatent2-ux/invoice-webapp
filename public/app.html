@@ -184,6 +184,55 @@
     background:#fff;border:1px dashed var(--border-light);border-radius:10px;
   }
 
+  /* ---------- PAYMENTS VIEW ---------- */
+  .payments-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
+  .payments-toolbar .btn{white-space:nowrap;}
+  .account-split-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px;}
+  .account-split-card{background:#fff;border:1px solid var(--border-light);border-radius:10px;padding:16px 18px;}
+  .account-split-card .as-label{font-size:11.5px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:0.03em;}
+  .account-split-card .as-num{font-size:20px;font-weight:800;color:var(--navy);margin-top:6px;font-family:'Courier New',monospace;}
+  .payments-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:18px;background:#fff;border:1px solid var(--border-light);border-radius:10px;padding:14px 16px;}
+  .payments-filters .pf-group{display:flex;flex-direction:column;gap:4px;}
+  .payments-filters label{font-size:11px;font-weight:700;color:var(--slate);}
+  .payments-filters input, .payments-filters select{
+    padding:7px 9px;border:1px solid var(--border-light);border-radius:6px;font-size:12.5px;font-family:Arial,sans-serif;
+  }
+  .payments-filters .pf-clear{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;text-decoration:underline;align-self:center;}
+  .payments-table-wrap{background:#fff;border:1px solid var(--border-light);border-radius:10px;overflow:hidden;}
+  table.payments-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.payments-table thead th{
+    background:var(--navy);color:#fff;text-align:left;padding:10px 14px;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.03em;font-weight:700;
+  }
+  table.payments-table tbody td{padding:10px 14px;border-bottom:1px solid var(--border-light);vertical-align:top;}
+  table.payments-table tbody tr:last-child td{border-bottom:none;}
+  table.payments-table tbody tr:hover{background:#F7F9FC;}
+  table.payments-table .pt-amt{font-family:'Courier New',monospace;font-weight:700;color:var(--navy);text-align:right;}
+  table.payments-table .pt-actions{text-align:right;white-space:nowrap;}
+  table.payments-table .pt-actions button{
+    font-size:11px;border:none;background:none;cursor:pointer;color:var(--slate);margin-left:8px;
+  }
+  table.payments-table .pt-actions button:hover{color:var(--accent);}
+  .account-tag{
+    display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;
+    background:#EAF0FA;color:var(--navy);
+  }
+  .account-tag.unspecified{background:#F1F1F1;color:var(--slate);}
+  .payments-empty-cell{text-align:center;padding:36px;color:var(--slate);font-size:12.5px;}
+  .client-link{cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;}
+  .client-link:hover{color:var(--accent);}
+  .client-profile-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0 20px;}
+  .client-profile-stats .cp-stat{background:#F7F9FC;border-radius:8px;padding:10px 12px;}
+  .client-profile-stats .cp-stat .cp-label{font-size:10.5px;color:var(--slate);font-weight:700;text-transform:uppercase;}
+  .client-profile-stats .cp-stat .cp-num{font-size:16px;font-weight:800;color:var(--navy);margin-top:3px;font-family:'Courier New',monospace;}
+  .cp-mini-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px;}
+  .cp-mini-table th{text-align:left;padding:6px 8px;font-size:10.5px;color:var(--slate);text-transform:uppercase;border-bottom:1px solid var(--border-light);}
+  .cp-mini-table td{padding:6px 8px;border-bottom:1px solid var(--border-light);}
+  .service-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-light);}
+  .service-row .sv-name{flex:1;font-weight:600;font-size:13px;color:var(--ink);}
+  .service-row .sv-price{font-family:'Courier New',monospace;font-size:12.5px;color:var(--navy);width:90px;text-align:right;}
+  .service-row .remove-link{margin-left:4px;}
+
   .canvas{padding:36px 34px 80px;display:flex;justify-content:center;}
 
   .invoice-paper{
@@ -243,6 +292,15 @@
   .row-remove:hover{color:#A13D2C;}
   tfoot.total-row td{background:var(--navy);color:#fff;font-weight:800;font-size:13.5px;padding:9px 8px;text-align:right;}
   tfoot.total-row td.total-label{text-align:left;}
+  tfoot.total-row #subtotalRow td, tfoot.total-row #discountRow td{
+    background:#fff;color:var(--ink);font-weight:600;font-size:12.5px;
+    border-bottom:1px solid var(--border-light);
+  }
+  tfoot.total-row #discountRow td{color:#A13D2C;}
+  .discount-col{display:none;}
+  .items.show-discount-col .discount-col{display:table-cell;}
+  .items thead .discount-col{font-size:10px;}
+  .item-discount-check{width:16px;height:16px;cursor:pointer;}
 
   .add-row-btn{
     margin:8px 0 4px;background:none;border:1px dashed var(--border-light);color:var(--slate);
@@ -350,6 +408,7 @@
     </div>
 
     <button class="nav-home-btn" id="homeBtn">🏠 Home</button>
+    <button class="nav-home-btn" id="paymentsBtn">💰 Payments</button>
     <button class="new-invoice-btn" id="newInvoiceBtn">+ New invoice</button>
     <button class="new-estimate-btn" id="newEstimateBtn">+ New estimate</button>
 
@@ -372,6 +431,14 @@
       <div id="dashboardBody"></div>
     </div>
 
+    <div id="paymentsView" class="dashboard-view">
+      <div class="dashboard-header">
+        <div class="dashboard-title">Payments</div>
+        <div class="dashboard-sub">Every payment received, and which account it landed in</div>
+      </div>
+      <div id="paymentsBody"></div>
+    </div>
+
     <div id="editorView">
       <div class="toolbar no-print">
         <div class="toolbar-title" id="toolbarTitle">New invoice</div>
@@ -386,6 +453,7 @@
           <label>Received</label>
           <input type="number" id="amountPaidField" min="0" step="0.01" value="0">
         </div>
+        <button class="btn" id="recordPaymentFromInvoiceBtn" title="Log this as a payment, tagged to a bank account">+ Record payment</button>
         <button class="btn" id="convertBtn" style="display:none;">Convert to Invoice</button>
         <button class="btn" id="duplicateBtn">Duplicate</button>
         <button class="btn btn-danger" id="deleteBtn">Delete</button>
@@ -404,6 +472,7 @@
             <div class="invoice-word" id="invoiceWordEl">INVOICE</div>
             <input class="invoice-num-field" id="invoiceNumber" value="NPS/2026/001">
             <div class="meta-row"><label>Date:</label><input type="date" id="invoiceDate"></div>
+            <div class="meta-row" id="dueDateRow"><label>Due:</label><input type="date" id="dueDateField"></div>
           </div>
         </div>
 
@@ -430,27 +499,60 @@
           <input id="poField" placeholder="Email Request">
         </div>
 
-        <table class="items">
+        <table class="items" id="itemsTable">
           <thead>
             <tr>
               <th class="idx">#</th>
-              <th style="width:44%">Item Description</th>
-              <th class="num" style="width:16%">Price (USD)</th>
-              <th class="num" style="width:16%">Quantity</th>
-              <th class="num" style="width:19%">Amount (USD)</th>
+              <th style="width:40%">Item Description</th>
+              <th class="num" style="width:14%">Price (USD)</th>
+              <th class="num" style="width:14%">Quantity</th>
+              <th class="num" style="width:17%">Amount (USD)</th>
+              <th class="discount-col no-print" style="width:9%;text-align:center;">Disc.</th>
               <th style="width:4%"></th>
             </tr>
           </thead>
           <tbody id="itemsBody"></tbody>
           <tfoot class="total-row">
+            <tr id="subtotalRow" style="display:none;">
+              <td class="total-label subtotal-label" colspan="4">Subtotal</td>
+              <td id="subtotalVal">$0.00</td>
+              <td class="discount-col no-print"></td>
+              <td class="no-print"></td>
+            </tr>
+            <tr id="discountRow" style="display:none;">
+              <td class="total-label subtotal-label" colspan="4" id="discountLabelCell">Discount</td>
+              <td id="discountVal">-$0.00</td>
+              <td class="discount-col no-print"></td>
+              <td class="no-print"></td>
+            </tr>
             <tr>
               <td class="total-label" id="totalLabelCell" colspan="4">TOTAL</td>
               <td id="totalVal">$0.00</td>
+              <td class="discount-col no-print"></td>
               <td class="no-print"></td>
             </tr>
           </tfoot>
         </table>
-        <button class="add-row-btn no-print" id="addRowBtn">+ Add line item</button>
+        <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+            <button class="add-row-btn" id="addRowBtn">+ Add line item</button>
+            <select id="servicePickerSelect" style="padding:6px;border:1px solid var(--border-light);border-radius:5px;font-size:12px;">
+              <option value="">+ Add saved service...</option>
+            </select>
+            <button class="remove-link" id="manageServicesBtn" type="button">Manage services</button>
+          </div>
+          <div class="discount-controls" id="discountControls" style="display:flex;gap:8px;align-items:center;">
+            <label style="font-size:12px;display:flex;gap:5px;align-items:center;">
+              <input type="checkbox" id="discountEnabledCheckbox"> Apply discount
+            </label>
+            <select id="discountTypeSelect" style="display:none;padding:5px;border:1px solid var(--border-light);border-radius:5px;font-size:12px;">
+              <option value="percent">%</option>
+              <option value="fixed">Fixed amount</option>
+            </select>
+            <input type="number" id="discountValueField" style="display:none;width:90px;padding:5px;border:1px solid var(--border-light);border-radius:5px;font-size:12px;" min="0" step="0.01" placeholder="0">
+            <input type="text" id="discountNoteField" style="display:none;width:220px;padding:5px;border:1px solid var(--border-light);border-radius:5px;font-size:12px;" placeholder="Custom wording (optional)">
+          </div>
+        </div>
 
         <div class="amount-words" id="amountWords">(Zero US Dollars Only)</div>
 
@@ -575,6 +677,10 @@
     <div id="bankAccountsContainer"></div>
     <button class="upload-btn" id="addBankAccountBtn" type="button" style="margin-bottom:16px;">+ Add bank account</button>
 
+    <h3>Backup</h3>
+    <p class="hint" style="margin-top:-6px;">Download everything — invoices, estimates, clients, and payments — as a single file you can keep somewhere safe. Not automatic; run it whenever you want a fresh copy.</p>
+    <button class="upload-btn" id="downloadBackupBtn" type="button" style="margin-bottom:16px;">⬇ Download full backup</button>
+
     <div class="modal-actions">
       <button class="btn" id="cancelCompanyModal">Cancel</button>
       <button class="btn btn-primary" id="saveCompanyModal">Save company details</button>
@@ -582,13 +688,94 @@
   </div>
 </div>
 
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="paymentModalOverlay">
+  <div class="modal">
+    <h2 id="paymentModalTitle">Record a payment</h2>
+    <p class="hint">Log money received, and which of your bank accounts it landed in.</p>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Date received</label>
+        <input id="payDate" type="date">
+      </div>
+      <div class="field-group">
+        <label>Amount</label>
+        <input id="payAmount" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Client</label>
+      <input id="payClient" type="text" placeholder="Client name" list="payClientList">
+      <datalist id="payClientList"></datalist>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>Bank account</label>
+        <select id="payAccount"></select>
+      </div>
+      <div class="field-group">
+        <label>Linked invoice (optional)</label>
+        <select id="payInvoice"></select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>Method (optional)</label>
+        <input id="payMethod" type="text" placeholder="Wire, Zelle, Check...">
+      </div>
+      <div class="field-group">
+        <label>Notes (optional)</label>
+        <input id="payNotes" type="text" placeholder="">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" id="deletePaymentBtn" style="margin-right:auto;color:#A13D2C;border-color:#E3B7AC;display:none;">Delete payment</button>
+      <button class="btn" id="cancelPaymentModal">Cancel</button>
+      <button class="btn btn-primary" id="savePaymentModal">Save payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT PROFILE MODAL -->
+<div class="modal-overlay" id="clientProfileModalOverlay">
+  <div class="modal">
+    <h2 id="clientProfileName">Client</h2>
+    <p class="hint">Everything on record for this client, in one place.</p>
+    <div id="clientProfileBody"></div>
+    <div class="modal-actions">
+      <button class="btn" id="closeClientProfileBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES MODAL -->
+<div class="modal-overlay" id="servicesModalOverlay">
+  <div class="modal">
+    <h2>Saved services</h2>
+    <p class="hint">Save services you bill often, with a default price, so you can add them to any invoice or estimate in one click.</p>
+    <div id="servicesListContainer"></div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>Service name</label>
+        <input id="newServiceName" type="text" placeholder="e.g. USPTO Filing Fee">
+      </div>
+      <div class="field-group">
+        <label>Default price</label>
+        <input id="newServicePrice" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <button class="upload-btn" id="addServiceBtn" type="button" style="margin-bottom:16px;">+ Add service</button>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="closeServicesModal">Done</button>
+    </div>
+  </div>
+</div>
+
+<script src="/xlsx-js-style.bundle.js" defer></script>
+
 <script>
-// ---------- window.storage polyfill ----------
-// This app runs as a real deployed web app (not inside the Claude artifact
-// sandbox), so window.storage isn't provided by the environment. This shim
-// gives the rest of the code the exact same get/set/delete/list interface,
-// backed by this server's /api/storage/:key routes (see server.js), which
-// persist to Postgres. Without this block, every call below silently fails.
 window.storage = {
   async get(key, shared){
     const res = await fetch('/api/storage/' + encodeURIComponent(key));
@@ -619,7 +806,6 @@ window.storage = {
     return await res.json();
   }
 };
-
 (function(){
 
   const $ = id => document.getElementById(id);
@@ -661,14 +847,636 @@ window.storage = {
   // ---------- VIEW SWITCHING ----------
   function showDashboard(){
     $('dashboardView').classList.add('show');
+    $('paymentsView').classList.remove('show');
     $('editorView').classList.add('hidden');
     $('homeBtn').classList.add('active');
+    $('paymentsBtn').classList.remove('active');
     renderDashboard();
   }
   function showEditor(){
     $('dashboardView').classList.remove('show');
+    $('paymentsView').classList.remove('show');
     $('editorView').classList.remove('hidden');
     $('homeBtn').classList.remove('active');
+    $('paymentsBtn').classList.remove('active');
+  }
+
+  function showPayments(){
+    $('dashboardView').classList.remove('show');
+    $('editorView').classList.add('hidden');
+    $('paymentsView').classList.add('show');
+    $('homeBtn').classList.remove('active');
+    $('paymentsBtn').classList.add('active');
+    renderPayments();
+  }
+
+  function accountLabelById(id){
+    if (!id) return null;
+    const acct = (company.bankAccounts||[]).find(a=>a.id===id);
+    return acct ? (acct.label || acct.bankName || 'Account') : null;
+  }
+
+  function getPaymentFilters(){
+    return {
+      from: $('pfFrom') ? $('pfFrom').value : '',
+      to: $('pfTo') ? $('pfTo').value : '',
+      account: $('pfAccount') ? $('pfAccount').value : '',
+      client: $('pfClient') ? $('pfClient').value.trim().toLowerCase() : ''
+    };
+  }
+
+  function filteredPayments(){
+    const f = getPaymentFilters();
+    return payments.filter(p=>{
+      if (f.from && p.date < f.from) return false;
+      if (f.to && p.date > f.to) return false;
+      if (f.account === '__unspecified__' && p.bankAccountId) return false;
+      if (f.account && f.account !== '__unspecified__' && p.bankAccountId !== f.account) return false;
+      if (f.client && !(p.client||'').toLowerCase().includes(f.client)) return false;
+      return true;
+    }).sort((a,b)=> (b.date||'').localeCompare(a.date||'') || (b.createdAt||0)-(a.createdAt||0));
+  }
+
+  function renderPayments(){
+    const body = $('paymentsBody');
+    const currency = company.currency || '$';
+
+    if (payments.length === 0){
+      body.innerHTML = `
+        <div class="payments-toolbar">
+          <div></div>
+          <button class="btn btn-primary" id="recordPaymentBtn">+ Record payment</button>
+        </div>
+        <div class="dashboard-empty">No payments recorded yet. Click "Record payment" to log your first one.</div>
+      `;
+      $('recordPaymentBtn').addEventListener('click', ()=>openPaymentModal(null));
+      return;
+    }
+
+    // Preserve filter values across re-render
+    const prevFilters = getPaymentFilters();
+
+    const totalAll = payments.reduce((s,p)=> s + (parseFloat(p.amount)||0), 0);
+    const thisMonthKey = todayStr().slice(0,7);
+    const totalThisMonth = payments.filter(p=> (p.date||'').slice(0,7) === thisMonthKey)
+      .reduce((s,p)=> s + (parseFloat(p.amount)||0), 0);
+
+    const accounts = company.bankAccounts || [];
+    const byAccount = accounts.map(a=>({
+      id: a.id,
+      label: a.label || a.bankName || 'Account',
+      total: payments.filter(p=>p.bankAccountId===a.id).reduce((s,p)=> s + (parseFloat(p.amount)||0), 0)
+    }));
+    const unspecifiedTotal = payments.filter(p=>!p.bankAccountId).reduce((s,p)=> s + (parseFloat(p.amount)||0), 0);
+
+    const rows = filteredPayments();
+    const years = Array.from(new Set(payments.map(p=>(p.date||'').slice(0,4)).filter(Boolean))).sort().reverse();
+    const currentYear = String(new Date().getFullYear());
+    if (!years.includes(currentYear)) years.unshift(currentYear);
+
+    body.innerHTML = `
+      <div class="payments-toolbar">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="taxYearSelect">
+            ${years.map(y=>`<option value="${y}" ${y===currentYear?'selected':''}>${y}</option>`).join('')}
+          </select>
+          <button class="btn" id="downloadTaxSummaryBtn">Revenue summary</button>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn" id="downloadPaymentsBtn">⬇ Download Excel</button>
+          <button class="btn btn-primary" id="recordPaymentBtn">+ Record payment</button>
+        </div>
+      </div>
+
+      <div class="money-panel" style="margin-bottom:22px;">
+        <div class="money-card">
+          <div class="money-label">Total received (all time)</div>
+          <div class="money-num">${currency}${money(totalAll)}</div>
+        </div>
+        <div class="money-card alt">
+          <div class="money-label">Received this month</div>
+          <div class="money-num">${currency}${money(totalThisMonth)}</div>
+        </div>
+        <div class="money-card alt">
+          <div class="money-label">Total payments logged</div>
+          <div class="money-num">${payments.length}</div>
+        </div>
+      </div>
+
+      <div class="breakdown-title">By bank account</div>
+      <div class="account-split-grid">
+        ${byAccount.map(a=>`
+          <div class="account-split-card">
+            <div class="as-label">${escapeAttr(a.label)}</div>
+            <div class="as-num">${currency}${money(a.total)}</div>
+          </div>
+        `).join('')}
+        ${unspecifiedTotal > 0 ? `
+          <div class="account-split-card">
+            <div class="as-label">Unspecified / not tagged</div>
+            <div class="as-num">${currency}${money(unspecifiedTotal)}</div>
+          </div>
+        ` : ''}
+      </div>
+
+      <div class="breakdown-title">All payments</div>
+      <div class="payments-filters">
+        <div class="pf-group">
+          <label>From</label>
+          <input type="date" id="pfFrom" value="${escapeAttr(prevFilters.from)}">
+        </div>
+        <div class="pf-group">
+          <label>To</label>
+          <input type="date" id="pfTo" value="${escapeAttr(prevFilters.to)}">
+        </div>
+        <div class="pf-group">
+          <label>Account</label>
+          <select id="pfAccount">
+            <option value="">All accounts</option>
+            ${accounts.map(a=>`<option value="${escapeAttr(a.id)}">${escapeAttr(a.label||a.bankName||'Account')}</option>`).join('')}
+            <option value="__unspecified__">Unspecified</option>
+          </select>
+        </div>
+        <div class="pf-group">
+          <label>Client</label>
+          <input type="text" id="pfClient" placeholder="Search client" value="${escapeAttr(prevFilters.client)}">
+        </div>
+        <button class="pf-clear" id="pfClear">Clear filters</button>
+      </div>
+
+      <div class="payments-table-wrap">
+        <table class="payments-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Account</th>
+              <th>Linked invoice</th>
+              <th>Method</th>
+              <th style="text-align:right;">Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.length === 0 ? `<tr><td colspan="7" class="payments-empty-cell">No payments match these filters.</td></tr>` :
+              rows.map(p=>{
+                const acctLabel = accountLabelById(p.bankAccountId);
+                const linkedInv = p.invoiceId ? (invoices.find(i=>i.id===p.invoiceId)||{}).number : null;
+                return `
+                  <tr data-id="${p.id}">
+                    <td>${escapeAttr(p.date||'')}</td>
+                    <td><span class="client-link" data-client="${escapeAttr(p.client||'')}">${escapeAttr(p.client||'Unnamed')}</span></td>
+                    <td>${acctLabel ? `<span class="account-tag">${escapeAttr(acctLabel)}</span>` : `<span class="account-tag unspecified">Unspecified</span>`}</td>
+                    <td>${linkedInv ? escapeAttr(linkedInv) : '—'}</td>
+                    <td>${escapeAttr(p.method||'—')}</td>
+                    <td class="pt-amt">${currency}${money(p.amount||0)}</td>
+                    <td class="pt-actions"><button class="pt-edit" data-id="${p.id}">Edit</button></td>
+                  </tr>
+                `;
+              }).join('')
+            }
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    $('recordPaymentBtn').addEventListener('click', ()=>openPaymentModal(null));
+    $('downloadPaymentsBtn').addEventListener('click', ()=>downloadPaymentsExcel(filteredPayments()));
+    $('downloadTaxSummaryBtn').addEventListener('click', ()=>downloadTaxSummary($('taxYearSelect').value));
+    $('pfFrom').addEventListener('input', renderPayments);
+    $('pfTo').addEventListener('input', renderPayments);
+    $('pfAccount').addEventListener('change', renderPayments);
+    $('pfClient').addEventListener('input', renderPayments);
+    $('pfAccount').value = prevFilters.account;
+    $('pfClear').addEventListener('click', ()=>{
+      $('pfFrom').value=''; $('pfTo').value=''; $('pfAccount').value=''; $('pfClient').value='';
+      renderPayments();
+    });
+    body.querySelectorAll('.pt-edit').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const p = payments.find(x=>x.id===btn.dataset.id);
+        if (p) openPaymentModal(p);
+      });
+    });
+  }
+
+  function populatePaymentModalDropdowns(){
+    const acctSel = $('payAccount');
+    acctSel.innerHTML = '<option value="">Unspecified</option>' +
+      (company.bankAccounts||[]).map(a=>`<option value="${escapeAttr(a.id)}">${escapeAttr(a.label||a.bankName||'Account')}</option>`).join('');
+
+    const invSel = $('payInvoice');
+    const sortedInv = invoices.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    invSel.innerHTML = '<option value="">Not linked to an invoice</option>' +
+      sortedInv.map(i=>`<option value="${escapeAttr(i.id)}">${escapeAttr(i.number)} — ${escapeAttr(i.toName||'Untitled')}</option>`).join('');
+
+    const dl = $('payClientList');
+    const names = new Set();
+    clients.forEach(c=>{ if (c.name) names.add(c.name); });
+    invoices.forEach(i=>{ if (i.toName) names.add(i.toName); });
+    dl.innerHTML = Array.from(names).sort().map(n=>`<option value="${escapeAttr(n)}"></option>`).join('');
+  }
+
+  function openPaymentModal(payment){
+    populatePaymentModalDropdowns();
+    editingPaymentId = payment ? payment.id : null;
+    $('paymentModalTitle').textContent = payment ? 'Edit payment' : 'Record a payment';
+    $('payDate').value = payment ? payment.date : todayStr();
+    $('payAmount').value = payment ? payment.amount : '';
+    $('payClient').value = payment ? (payment.client||'') : '';
+    $('payAccount').value = payment ? (payment.bankAccountId||'') : (company.defaultBankAccountId||'');
+    $('payInvoice').value = payment ? (payment.invoiceId||'') : '';
+    $('payMethod').value = payment ? (payment.method||'') : '';
+    $('payNotes').value = payment ? (payment.notes||'') : '';
+    $('deletePaymentBtn').style.display = payment ? '' : 'none';
+    $('paymentModalOverlay').classList.add('show');
+  }
+  function closePaymentModal(){
+    $('paymentModalOverlay').classList.remove('show');
+    editingPaymentId = null;
+  }
+
+  async function savePaymentModal(){
+    const amount = parseFloat($('payAmount').value);
+    if (!$('payClient').value.trim()){ toast('Enter a client name'); return; }
+    if (!amount || amount <= 0){ toast('Enter a valid amount'); return; }
+
+    let previousInvoiceId = null;
+    let newInvoiceId = $('payInvoice').value || null;
+
+    if (editingPaymentId){
+      const p = payments.find(x=>x.id===editingPaymentId);
+      if (p){
+        previousInvoiceId = p.invoiceId;
+        p.date = $('payDate').value || todayStr();
+        p.amount = amount;
+        p.client = $('payClient').value.trim();
+        p.bankAccountId = $('payAccount').value || null;
+        p.invoiceId = newInvoiceId;
+        p.method = $('payMethod').value.trim();
+        p.notes = $('payNotes').value.trim();
+      }
+    } else {
+      payments.push({
+        id: uid(),
+        date: $('payDate').value || todayStr(),
+        amount: amount,
+        client: $('payClient').value.trim(),
+        bankAccountId: $('payAccount').value || null,
+        invoiceId: newInvoiceId,
+        method: $('payMethod').value.trim(),
+        notes: $('payNotes').value.trim(),
+        createdAt: Date.now()
+      });
+    }
+    await persistPayments();
+    if (previousInvoiceId && previousInvoiceId !== newInvoiceId) await syncInvoiceFromPayments(previousInvoiceId);
+    if (newInvoiceId) await syncInvoiceFromPayments(newInvoiceId);
+    closePaymentModal();
+    renderPayments();
+    toast('Payment saved');
+  }
+
+  async function deletePaymentModal(){
+    if (!editingPaymentId) return;
+    const p = payments.find(x=>x.id===editingPaymentId);
+    const linkedInvoiceId = p ? p.invoiceId : null;
+    payments = payments.filter(x=>x.id !== editingPaymentId);
+    await persistPayments();
+    if (linkedInvoiceId) await syncInvoiceFromPayments(linkedInvoiceId);
+    closePaymentModal();
+    renderPayments();
+    toast('Payment deleted');
+  }
+
+  // ---------- EXCEL STYLING HELPERS ----------
+  // Shared look for every workbook we generate, matching the app's own navy
+  // brand color. Uses xlsx-js-style (a SheetJS fork) for real cell styling —
+  // fills, fonts, borders — which the plain community edition can't write.
+  const XL_NAVY = '173A68';
+  const XL_ACCENT = '2C5FAA';
+  const XL_SLATE = '5B6472';
+  const XL_BORDER = 'C7CFDA';
+  const XL_BAND = 'F3F6FA';
+  const xlThinBorder = {
+    top:{style:'thin',color:{rgb:XL_BORDER}}, bottom:{style:'thin',color:{rgb:XL_BORDER}},
+    left:{style:'thin',color:{rgb:XL_BORDER}}, right:{style:'thin',color:{rgb:XL_BORDER}}
+  };
+  function xlTitleCell(text){ return { v:text, t:'s', s:{ font:{ bold:true, sz:16, color:{rgb:XL_NAVY} } } }; }
+  function xlSubtitleCell(text){ return { v:text, t:'s', s:{ font:{ sz:10.5, color:{rgb:XL_SLATE} } } }; }
+  function xlHeaderCell(text){
+    return { v:text, t:'s', s:{
+      fill:{ patternType:'solid', fgColor:{rgb:XL_NAVY} },
+      font:{ bold:true, sz:10.5, color:{rgb:'FFFFFF'} },
+      alignment:{ vertical:'center', horizontal:'left' },
+      border: xlThinBorder
+    }};
+  }
+  function xlDataCell(value, opts){
+    opts = opts || {};
+    const isNum = typeof value === 'number';
+    const cell = { v:value, t: isNum ? 'n' : 's' };
+    cell.s = {
+      border: xlThinBorder,
+      font:{ bold: !!opts.bold, sz:10.5, color:{rgb: opts.color || '1A1A1A'} },
+      alignment:{ horizontal: opts.align || (isNum ? 'right' : 'left') },
+      fill: opts.band ? { patternType:'solid', fgColor:{rgb:XL_BAND} } : undefined
+    };
+    if (opts.currency) cell.z = '"' + (company.currency||'$') + '"#,##0.00';
+    return cell;
+  }
+  function xlTotalCell(value, opts){
+    opts = opts || {};
+    const isNum = typeof value === 'number';
+    const cell = { v:value, t: isNum ? 'n' : 's' };
+    cell.s = {
+      fill:{ patternType:'solid', fgColor:{rgb:'E9EEF7'} },
+      font:{ bold:true, sz:10.5, color:{rgb:XL_NAVY} },
+      alignment:{ horizontal: opts.align || (isNum ? 'right' : 'left') },
+      border:{ top:{style:'medium',color:{rgb:XL_NAVY}}, bottom:xlThinBorder.bottom, left:xlThinBorder.left, right:xlThinBorder.right }
+    };
+    if (opts.currency) cell.z = '"' + (company.currency||'$') + '"#,##0.00';
+    return cell;
+  }
+
+  function downloadPaymentsExcel(rows){
+    if (typeof XLSX === 'undefined'){
+      toast('Still loading — try again in a moment');
+      return;
+    }
+    const cols = ['Date','Client','Amount','Bank Account','Linked Invoice','Method','Notes'];
+    const ws = {};
+    let r = 0;
+    const set = (c, cell) => { ws[XLSX.utils.encode_cell({r, c})] = cell; };
+
+    set(0, xlTitleCell(company.name || 'Payments'));
+    r++;
+    set(0, xlSubtitleCell(`Payments report — generated ${todayStr()}`));
+    r++;
+    set(0, xlSubtitleCell(`${rows.length} payment${rows.length===1?'':'s'}`));
+    r += 2;
+
+    const headerRow = r;
+    cols.forEach((c,i)=> set(i, xlHeaderCell(c)));
+    r++;
+
+    let total = 0;
+    rows.forEach((p, idx)=>{
+      const band = idx % 2 === 1;
+      const amount = parseFloat(p.amount)||0;
+      total += amount;
+      const vals = [
+        p.date || '',
+        p.client || '',
+        amount,
+        accountLabelById(p.bankAccountId) || 'Unspecified',
+        p.invoiceId ? ((invoices.find(i=>i.id===p.invoiceId)||{}).number || '') : '',
+        p.method || '',
+        p.notes || ''
+      ];
+      vals.forEach((v,c)=> set(c, xlDataCell(v, { band, currency: c===2 })));
+      r++;
+    });
+
+    set(0, xlTotalCell('TOTAL'));
+    for (let c=1;c<cols.length;c++) set(c, c===2 ? xlTotalCell(total, {currency:true}) : xlTotalCell(''));
+    const totalRow = r;
+    r++;
+
+    ws['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:totalRow,c:cols.length-1} });
+    ws['!cols'] = [{wch:12},{wch:22},{wch:12},{wch:20},{wch:16},{wch:16},{wch:26}];
+    ws['!merges'] = [
+      { s:{r:0,c:0}, e:{r:0,c:cols.length-1} },
+      { s:{r:1,c:0}, e:{r:1,c:cols.length-1} },
+      { s:{r:2,c:0}, e:{r:2,c:cols.length-1} }
+    ];
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:headerRow,c:0}, e:{r:headerRow,c:cols.length-1} }) };
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Payments');
+    XLSX.writeFile(wb, 'payments-' + todayStr() + '.xlsx');
+  }
+
+  // ---------- CLIENT PROFILE ----------
+  function openClientProfile(name){
+    if (!name) return;
+    const currency = company.currency || '$';
+    const key = name.trim().toLowerCase();
+    const clientInvoices = invoices.filter(i => (i.toName||'').trim().toLowerCase() === key)
+      .sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    const clientPayments = payments.filter(p => (p.client||'').trim().toLowerCase() === key)
+      .sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+
+    const totalInvoiced = clientInvoices.reduce((s,i)=> s + (i.total||0), 0);
+    const totalReceived = clientPayments.reduce((s,p)=> s + (parseFloat(p.amount)||0), 0);
+    const outstanding = clientInvoices.reduce((s,i)=> s + Math.max((i.total||0)-(parseFloat(i.amountPaid)||0),0), 0);
+
+    // Best-effort average days-to-pay: for each Paid invoice with at least one
+    // linked payment, compare the invoice date to its latest linked payment date.
+    let dayDiffs = [];
+    clientInvoices.filter(i=>i.status==='Paid').forEach(inv=>{
+      const linked = clientPayments.filter(p=>p.invoiceId===inv.id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      if (linked.length && inv.date){
+        const diff = Math.round((new Date(linked[0].date) - new Date(inv.date)) / 86400000);
+        if (!isNaN(diff) && diff >= 0) dayDiffs.push(diff);
+      }
+    });
+    const avgDays = dayDiffs.length ? Math.round(dayDiffs.reduce((s,d)=>s+d,0)/dayDiffs.length) : null;
+
+    $('clientProfileName').textContent = name;
+    $('clientProfileBody').innerHTML = `
+      <div class="client-profile-stats">
+        <div class="cp-stat"><div class="cp-label">Lifetime invoiced</div><div class="cp-num">${currency}${money(totalInvoiced)}</div></div>
+        <div class="cp-stat"><div class="cp-label">Lifetime received</div><div class="cp-num">${currency}${money(totalReceived)}</div></div>
+        <div class="cp-stat"><div class="cp-label">Outstanding</div><div class="cp-num">${currency}${money(outstanding)}</div></div>
+        <div class="cp-stat"><div class="cp-label">Avg. days to pay</div><div class="cp-num">${avgDays!==null ? avgDays : '—'}</div></div>
+      </div>
+
+      <h3>Invoices (${clientInvoices.length})</h3>
+      ${clientInvoices.length ? `
+        <table class="cp-mini-table">
+          <thead><tr><th>Number</th><th>Date</th><th>Status</th><th style="text-align:right;">Total</th><th style="text-align:right;">Received</th></tr></thead>
+          <tbody>
+            ${clientInvoices.map(i=>`<tr><td>${escapeAttr(i.number)}</td><td>${escapeAttr(i.date||'')}</td><td>${escapeAttr(i.status)}</td><td style="text-align:right;">${currency}${money(i.total)}</td><td style="text-align:right;">${currency}${money(i.amountPaid||0)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      ` : `<p class="hint">No invoices on record.</p>`}
+
+      <h3>Payments (${clientPayments.length})</h3>
+      ${clientPayments.length ? `
+        <table class="cp-mini-table">
+          <thead><tr><th>Date</th><th>Account</th><th style="text-align:right;">Amount</th></tr></thead>
+          <tbody>
+            ${clientPayments.map(p=>`<tr><td>${escapeAttr(p.date||'')}</td><td>${escapeAttr(accountLabelById(p.bankAccountId)||'Unspecified')}</td><td style="text-align:right;">${currency}${money(p.amount||0)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      ` : `<p class="hint">No payments on record.</p>`}
+    `;
+    $('clientProfileModalOverlay').classList.add('show');
+  }
+  function closeClientProfile(){ $('clientProfileModalOverlay').classList.remove('show'); }
+
+  // ---------- SAVED SERVICES ----------
+  function renderServicePicker(){
+    const sel = $('servicePickerSelect');
+    const currency = company.currency || '$';
+    const sorted = services.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+    sel.innerHTML = '<option value="">+ Add saved service...</option>' +
+      sorted.map(s => `<option value="${escapeAttr(s.id)}">${escapeAttr(s.name)} — ${currency}${money(s.price)}</option>`).join('');
+  }
+
+  function renderServicesModal(){
+    const currency = company.currency || '$';
+    const container = $('servicesListContainer');
+    if (!services.length){
+      container.innerHTML = `<p class="hint">No saved services yet — add one below.</p>`;
+      return;
+    }
+    const sorted = services.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+    container.innerHTML = sorted.map(s => `
+      <div class="service-row" data-id="${escapeAttr(s.id)}">
+        <span class="sv-name">${escapeAttr(s.name)}</span>
+        <span class="sv-price">${currency}${money(s.price)}</span>
+        <button class="remove-link sv-remove" data-id="${escapeAttr(s.id)}" type="button">Remove</button>
+      </div>
+    `).join('');
+    container.querySelectorAll('.sv-remove').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        services = services.filter(s=>s.id !== btn.dataset.id);
+        await persistServices();
+        renderServicesModal();
+        renderServicePicker();
+      });
+    });
+  }
+
+  function openServicesModal(){
+    renderServicesModal();
+    $('newServiceName').value = '';
+    $('newServicePrice').value = '';
+    $('servicesModalOverlay').classList.add('show');
+  }
+  function closeServicesModal(){ $('servicesModalOverlay').classList.remove('show'); }
+
+  async function addService(){
+    const name = $('newServiceName').value.trim();
+    const price = parseFloat($('newServicePrice').value);
+    if (!name){ toast('Enter a service name'); return; }
+    if (!price || price <= 0){ toast('Enter a valid price'); return; }
+    services.push({ id: uid(), name, price });
+    await persistServices();
+    $('newServiceName').value = '';
+    $('newServicePrice').value = '';
+    renderServicesModal();
+    renderServicePicker();
+    toast('Service saved');
+  }
+
+  // ---------- TAX / YEAR-END SUMMARY ----------
+  function downloadTaxSummary(year){
+    if (typeof XLSX === 'undefined'){
+      toast('Still loading — try again in a moment');
+      return;
+    }
+    const yearPayments = payments.filter(p => (p.date||'').slice(0,4) === String(year));
+    const byClient = {};
+    yearPayments.forEach(p=>{
+      const name = p.client || 'Unnamed';
+      byClient[name] = (byClient[name]||0) + (parseFloat(p.amount)||0);
+    });
+    const sortedNames = Object.keys(byClient).sort((a,b)=> byClient[b]-byClient[a]);
+    const total = yearPayments.reduce((s,p)=> s+(parseFloat(p.amount)||0), 0);
+
+    const ws = {};
+    let r = 0;
+    const set = (c, cell) => { ws[XLSX.utils.encode_cell({r, c})] = cell; };
+
+    set(0, xlTitleCell(company.name || 'Revenue Summary'));
+    r++;
+    set(0, xlSubtitleCell(`Revenue summary — ${year} — generated ${todayStr()}`));
+    r++;
+    set(0, xlSubtitleCell(`${sortedNames.length} client${sortedNames.length===1?'':'s'}`));
+    r += 2;
+
+    const headerRow = r;
+    set(0, xlHeaderCell('Client'));
+    set(1, xlHeaderCell(`${year} Total Received`));
+    r++;
+
+    sortedNames.forEach((name, idx)=>{
+      const band = idx % 2 === 1;
+      set(0, xlDataCell(name, { band }));
+      set(1, xlDataCell(byClient[name], { band, currency:true }));
+      r++;
+    });
+
+    set(0, xlTotalCell('TOTAL'));
+    set(1, xlTotalCell(total, { currency:true }));
+    const totalRow = r;
+    r++;
+
+    ws['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:totalRow,c:1} });
+    ws['!cols'] = [{wch:28},{wch:22}];
+    ws['!merges'] = [
+      { s:{r:0,c:0}, e:{r:0,c:1} },
+      { s:{r:1,c:0}, e:{r:1,c:1} },
+      { s:{r:2,c:0}, e:{r:2,c:1} }
+    ];
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:headerRow,c:0}, e:{r:headerRow,c:1} }) };
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, String(year));
+    XLSX.writeFile(wb, `revenue-summary-${year}.xlsx`);
+  }
+
+  // ---------- FULL BACKUP ----------
+  // A manual, one-click export of everything — not an automatic scheduled
+  // backup (that would need a server-side cron job), but a safety net you
+  // can run any time and keep somewhere outside this app.
+  function downloadFullBackup(){
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      company, invoices, estimates, clients, payments
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoice-backup-${todayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast('Backup downloaded');
+  }
+
+  // ---------- PAYMENT <-> INVOICE SYNC ----------
+  // Whenever a payment linked to an invoice is added, edited, or deleted,
+  // recompute that invoice's Received amount from the sum of its linked
+  // payments, and bump its status forward (never backward) so the two never
+  // drift apart. If the invoice is currently open in the editor, refresh
+  // what's on screen too.
+  async function syncInvoiceFromPayments(invoiceId){
+    if (!invoiceId) return;
+    const inv = invoices.find(i=>i.id===invoiceId);
+    if (!inv) return;
+    const linkedTotal = payments.filter(p=>p.invoiceId===invoiceId)
+      .reduce((s,p)=> s + (parseFloat(p.amount)||0), 0);
+    inv.amountPaid = linkedTotal;
+    if (linkedTotal >= (inv.total||0) && inv.total > 0){
+      inv.status = 'Paid';
+    } else if (linkedTotal > 0 && (inv.status === 'Sent' || inv.status === 'Overdue' || inv.status === 'Draft')){
+      inv.status = 'Partial';
+    } else if (linkedTotal > 0){
+      // already Partial or Paid — leave as-is unless it just crossed to fully paid (handled above)
+    }
+    inv.updatedAt = Date.now();
+    await persistInvoices();
+    if (currentId === invoiceId && docType === 'invoice'){
+      $('amountPaidField').value = inv.amountPaid;
+      $('statusSelect').value = inv.status;
+    }
+    renderLedger();
   }
 
   function renderDashboard(){
@@ -704,6 +1512,28 @@ window.storage = {
       monthMap[key].count += 1;
     });
     const monthRows = Object.values(monthMap).sort((a,b)=> b.key.localeCompare(a.key));
+
+    // Aging: how overdue is each unpaid balance, based on due date vs today.
+    // Invoices without a due date (older ones, from before this feature) or
+    // still in Draft are left out — there's nothing to age against yet.
+    const todayD = new Date(todayStr());
+    const buckets = { current:{label:'Not yet due',count:0,amt:0}, b30:{label:'1–30 days',count:0,amt:0}, b60:{label:'31–60 days',count:0,amt:0}, b90:{label:'61–90 days',count:0,amt:0}, b90p:{label:'90+ days',count:0,amt:0} };
+    const overdueList = [];
+    invoices.forEach(inv=>{
+      if (inv.status === 'Draft') return;
+      const bal = Math.max((inv.total||0) - (parseFloat(inv.amountPaid)||0), 0);
+      if (bal <= 0 || !inv.dueDate) return;
+      const diffDays = Math.floor((todayD - new Date(inv.dueDate)) / 86400000);
+      let key = 'current';
+      if (diffDays > 90) key = 'b90p';
+      else if (diffDays > 60) key = 'b90';
+      else if (diffDays > 30) key = 'b60';
+      else if (diffDays > 0) key = 'b30';
+      buckets[key].count += 1;
+      buckets[key].amt += bal;
+      if (key !== 'current') overdueList.push({ inv, diffDays, bal });
+    });
+    overdueList.sort((a,b)=> b.diffDays - a.diffDays);
 
     body.innerHTML = `
       <div class="stat-grid">
@@ -749,6 +1579,29 @@ window.storage = {
         </div>
       </div>
 
+      ${overdueList.length ? `
+      <div class="breakdown-title">Aging — outstanding balances by how overdue they are</div>
+      <div class="account-split-grid" style="margin-bottom:16px;">
+        ${['b30','b60','b90','b90p'].map(k=>`
+          <div class="account-split-card">
+            <div class="as-label">${buckets[k].label}</div>
+            <div class="as-num">${currency}${money(buckets[k].amt)}</div>
+            <div style="font-size:11px;color:var(--slate);margin-top:2px;">${buckets[k].count} invoice${buckets[k].count===1?'':'s'}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="breakdown-list" style="margin-bottom:28px;">
+        ${overdueList.slice(0,10).map(({inv,diffDays,bal})=>`
+          <div class="breakdown-row">
+            <span class="ledger-dot dot-overdue"></span>
+            <span class="b-num">${escapeAttr(inv.number)}</span>
+            <span class="b-client client-link" data-client="${escapeAttr(inv.toName||'')}">${escapeAttr(inv.toName||'Untitled client')}</span>
+            <span style="font-size:11px;color:#A13D2C;font-weight:700;margin-right:10px;">${diffDays}d overdue</span>
+            <span class="b-amt">${currency}${money(bal)}</span>
+          </div>
+        `).join('')}
+      </div>` : ''}
+
       <div class="breakdown-title">Month by month</div>
       <div class="month-table">
         <div class="month-row month-header">
@@ -776,7 +1629,7 @@ window.storage = {
           <div class="breakdown-row">
             <span class="ledger-dot dot-partial"></span>
             <span class="b-num">${inv.number}</span>
-            <span class="b-client">${inv.toName||'Untitled client'}</span>
+            <span class="b-client client-link" data-client="${escapeAttr(inv.toName||'')}">${inv.toName||'Untitled client'}</span>
             <span class="b-amt">${currency}${money(inv.amountPaid||0)} / ${currency}${money(inv.total||0)}</span>
           </div>
         `).join('')}
@@ -793,6 +1646,14 @@ window.storage = {
   let currentId = null;
   let items = [];
   let currentBankAccountId = null;
+  let payments = [];
+  let editingPaymentId = null;
+  let services = [];
+
+  // Historical payment log (Oct 2023 - Aug 2026), imported once on first load from
+  // the user's own tracking spreadsheet so the Payments dashboard starts with real
+  // history instead of empty. m=month(YYYY-MM), c=client, a=amount.
+  const HISTORICAL_PAYMENTS = [{m:'2023-10',c:'Wei-Cheng',a:250.0},{m:'2023-10',c:'Chang Liow',a:300.0},{m:'2023-11',c:'Navin',a:200.0},{m:'2023-11',c:'Srinivas',a:180.0},{m:'2023-11',c:'Mark',a:300.0},{m:'2023-11',c:'Wei-Cheng',a:250.0},{m:'2023-11',c:'Srinivas',a:160.0},{m:'2023-11',c:'Wei-Cheng',a:1000.0},{m:'2023-11',c:'Wei-Cheng',a:1000.0},{m:'2023-11',c:'Chang Liow',a:950.0},{m:'2023-11',c:'Wei-Cheng',a:249.0},{m:'2023-11',c:'Wei-Cheng',a:249.0},{m:'2023-11',c:'Chang Liow',a:249.0},{m:'2023-11',c:'Thor Daniel',a:1100.0},{m:'2023-12',c:'Adrian #1',a:250.0},{m:'2023-12',c:'Wilson',a:300.0},{m:'2023-12',c:'ZHZJ',a:325.0},{m:'2023-12',c:'Aktar Hossain',a:500.0},{m:'2023-12',c:'Adrian #2',a:240.0},{m:'2023-12',c:'Adrian #3',a:220.0},{m:'2023-12',c:'Adrian #4',a:220.0},{m:'2023-12',c:'Mark Adams',a:950.0},{m:'2023-12',c:'Mark Adams',a:249.0},{m:'2024-01',c:'Syed Abedi',a:300.0},{m:'2024-01',c:'Sudhakar #1',a:300.0},{m:'2024-01',c:'Sudhakar #1',a:500.0},{m:'2024-01',c:'Wilson',a:950.0},{m:'2024-01',c:'Wilson',a:249.0},{m:'2024-01',c:'ZHZJ',a:345.0},{m:'2024-02',c:'Solomon',a:300.0},{m:'2024-02',c:'Chris',a:300.0},{m:'2024-02',c:'Chris',a:500.0},{m:'2024-02',c:'CG Venkatesh',a:250.0},{m:'2024-02',c:'Sudhakar #2',a:300.0},{m:'2024-02',c:'Sudhakar #3',a:300.0},{m:'2024-02',c:'Syed Abedi',a:950.0},{m:'2024-02',c:'Syed Abedi',a:249.0},{m:'2024-02',c:'Sudhakar #2',a:500.0},{m:'2024-02',c:'Sudhakar #3',a:500.0},{m:'2024-03',c:'Sean',a:3500.0},{m:'2024-03',c:'Robert',a:300.0},{m:'2024-03',c:'Andrew',a:578.0},{m:'2024-03',c:'Neale',a:250.0},{m:'2024-03',c:'CG Venkatesh',a:550.0},{m:'2024-03',c:'Chris',a:835.0},{m:'2024-03',c:'Sudhakar #1',a:699.0},{m:'2024-03',c:'Thor Daniel',a:750.0},{m:'2024-03',c:'Sudhakar #3',a:699.0},{m:'2024-03',c:'Sudhakar #2',a:699.0},{m:'2024-03',c:'Chris- Trademark',a:1075.0},{m:'2024-04',c:'David',a:284.0},{m:'2024-04',c:'Jordan',a:300.0},{m:'2024-04',c:'Neale',a:550.0},{m:'2024-04',c:'Sudhajkar #4',a:1499.0},{m:'2024-04',c:'Adrian',a:220.0},{m:'2024-04',c:'Robert',a:500.0},{m:'2024-04',c:'Jurgen',a:850.0},{m:'2024-04',c:'Chang',a:627.0},{m:'2024-04',c:'Robert',a:927.0},{m:'2024-05',c:'Judith',a:300.0},{m:'2024-05',c:'Vinay',a:800.0},{m:'2024-05',c:'Jordan',a:500.0},{m:'2024-05',c:'Jordan',a:927.0},{m:'2024-05',c:'Venkatesh #1',a:699.0},{m:'2024-05',c:'David',a:500.0},{m:'2024-06',c:'Ramon',a:1700.0},{m:'2024-06',c:'Robert Ruvalcaba',a:300.0},{m:'2024-06',c:'Robert Ruvalcaba',a:500.0},{m:'2024-06',c:'CG Venkatesh #2',a:550.0},{m:'2024-07',c:'Joseph',a:300.0},{m:'2024-07',c:'Narayanan',a:500.0},{m:'2024-07',c:'Joseph',a:500.0},{m:'2024-07',c:'Narayanan',a:1199.0},{m:'2024-07',c:'Pat Charles',a:500.0},{m:'2024-07',c:'Joseph',a:899.0},{m:'2024-07',c:'Pat Charles',a:636.0},{m:'2024-07',c:'Sigmond',a:500.0},{m:'2024-07',c:'Gaston',a:300.0},{m:'2024-07',c:'Neale',a:899.0},{m:'2024-07',c:'David',a:652.0},{m:'2024-07',c:'Jordan #2',a:300.0},{m:'2024-07',c:'Robert',a:927.0},{m:'2024-07',c:'Chris',a:900.0},{m:'2024-07',c:'David',a:288.0},{m:'2024-07',c:'Jordan #2',a:500.0},{m:'2024-08',c:'Peter',a:300.0},{m:'2024-08',c:'Chris Thomas',a:300.0},{m:'2024-08',c:'Peter',a:250.0},{m:'2024-08',c:'Nikketa Lee',a:490.0},{m:'2024-08',c:'Joseph Borden',a:300.0},{m:'2024-08',c:'Joseph Borden',a:500.0},{m:'2024-08',c:'Nikketa Lee',a:1199.0},{m:'2024-08',c:'Austin Hurst',a:253.0},{m:'2024-08',c:'Jordan #2',a:927.0},{m:'2024-08',c:'Sigmond',a:827.0},{m:'2024-08',c:'Thor Daniel',a:544.0},{m:'2024-08',c:'Sudhakar #2',a:250.0},{m:'2024-08',c:'Peter Antros',a:350.0},{m:'2024-08',c:'Sigmond',a:100.0},{m:'2024-09',c:'Yue Wu',a:200.0},{m:'2024-09',c:'Yue Wu',a:449.0},{m:'2024-09',c:'Giovanni Vestita',a:302.0},{m:'2024-09',c:'Tuxufen Tu',a:302.0},{m:'2024-09',c:'Ana Cortez',a:302.0},{m:'2024-09',c:'Ben Silverstein',a:302.0},{m:'2024-09',c:'Yue Wu (Blake)',a:150.0},{m:'2024-09',c:'Giovanni Vestita',a:500.0},{m:'2024-09',c:'Ben Silverstein',a:500.0},{m:'2024-09',c:'Marshawn Dingess',a:605.0},{m:'2024-09',c:'Peter Antros',a:410.0},{m:'2024-09',c:'Gaston',a:1399.0},{m:'2024-09',c:'Joseph Borden',a:899.0},{m:'2024-09',c:'Jordan #1',a:500.0},{m:'2024-09',c:'Sigmond',a:150.0},{m:'2024-09',c:'Jordan #3',a:585.0},{m:'2024-09',c:'Jordan #4',a:300.0},{m:'2024-09',c:'Narayanan',a:500.0},{m:'2024-09',c:'Mahendra Chavan',a:410.0},{m:'2024-10',c:'Vishnu Sharma',a:640.0},{m:'2024-10',c:'Vishnu Sharma',a:799.0},{m:'2024-10',c:'Shaun Roy',a:302.0},{m:'2024-10',c:'Donald Compere',a:300.0},{m:'2024-10',c:'Brent Accent',a:302.0},{m:'2024-10',c:'Peter Antros',a:378.0},{m:'2024-10',c:'Giovanni Vestita',a:899.0},{m:'2024-10',c:'Ben Silverstein',a:912.0},{m:'2024-10',c:'Sudhajkar #4',a:500.0},{m:'2024-10',c:'Marshawn Dingess',a:899.0},{m:'2024-10',c:'Ana Cortez',a:353.0},{m:'2024-10',c:'David Blake',a:350.0},{m:'2024-10',c:'Jordan #2',a:500.0},{m:'2024-11',c:'Modupe Famodimu',a:300.0},{m:'2024-11',c:'Modupe Famodimu',a:500.0},{m:'2024-11',c:'Rocky Aviles',a:302.0},{m:'2024-11',c:'Paul Dominique',a:600.0},{m:'2024-11',c:'Thor Daniel',a:800.0},{m:'2024-11',c:'Jordan #5',a:400.0},{m:'2024-11',c:'Peter Antros',a:500.0},{m:'2024-11',c:'Shaun Roy',a:500.0},{m:'2024-11',c:'David Blake',a:400.0},{m:'2024-11',c:'Mark Adams (CIP)',a:699.0},{m:'2024-11',c:'Brent Accent',a:505.0},{m:'2024-11',c:'Vishnu Sharma',a:420.0},{m:'2024-11',c:'CG Venkatesh',a:150.0},{m:'2024-11',c:'Yue Wu #2',a:200.0},{m:'2024-12',c:'Aaratee Rao',a:300.0},{m:'2024-12',c:'Don Peterson',a:400.0},{m:'2024-12',c:'Don Peterson',a:100.0},{m:'2024-12',c:'Hubert',a:300.0},{m:'2024-12',c:'Rocky Aviles',a:505.0},{m:'2024-12',c:'Vishnu Sharma',a:1125.0},{m:'2024-12',c:'Yue Wu #2',a:449.0},{m:'2024-12',c:'Sigmond #2',a:300.0},{m:'2024-12',c:'Paul Dominique',a:1000.0},{m:'2024-12',c:'Modupe Famodimu',a:785.0},{m:'2024-12',c:'Rocky Aviles',a:1197.0},{m:'2024-12',c:'Xufen Tu',a:299.0},{m:'2024-12',c:'Xufen Tu',a:500.0},{m:'2025-01',c:'Todd Hays',a:598.0},{m:'2025-01',c:'Chris-TM',a:2000.0},{m:'2025-01',c:'Xufen Tu',a:899.0},{m:'2025-01',c:'Sigmond #4',a:300.0},{m:'2025-01',c:'Shaun Roy',a:899.0},{m:'2025-01',c:'Aaratee Rao',a:500.0},{m:'2025-01',c:'Hubert',a:1399.0},{m:'2025-01',c:'Sudhakar',a:1250.0},{m:'2025-01',c:'Ramon',a:150.0},{m:'2025-01',c:'David Blake',a:300.0},{m:'2025-01',c:'Joseph',a:400.0},{m:'2025-01',c:'Yue Wu',a:250.0},{m:'2025-02',c:'James Sheffled',a:300.0},{m:'2025-02',c:'James Sheffled',a:500.0},{m:'2025-02',c:'David L',a:350.0},{m:'2025-02',c:'Hubert',a:300.0},{m:'2025-02',c:'Xufen Tu',a:450.0},{m:'2025-02',c:'Mark Adams',a:350.0},{m:'2025-02',c:'Xufen Tu',a:450.0},{m:'2025-02',c:'Xufen Tu',a:500.0},{m:'2025-02',c:'Paul Dominique',a:1798.0},{m:'2025-02',c:'Subhash D',a:1050.0},{m:'2025-03',c:'Seda Byrant',a:1000.0},{m:'2025-03',c:'King',a:300.0},{m:'2025-03',c:'Roylynn',a:300.0},{m:'2025-03',c:'Peyman H',a:150.0},{m:'2025-03',c:'David A',a:400.0},{m:'2025-03',c:'Yue Wu',a:150.0},{m:'2025-03',c:'David L',a:299.0},{m:'2025-03',c:'James Sheffled',a:899.0},{m:'2025-03',c:'Adrian #5',a:250.0},{m:'2025-03',c:'Yue Wu',a:649.0},{m:'2025-03',c:'Xufen Tu',a:899.0},{m:'2025-03',c:'Chris-TM',a:400.0},{m:'2025-03',c:'Syed Abedi',a:750.0},{m:'2025-04',c:'Shrish N',a:299.0},{m:'2025-04',c:'David Xu',a:600.0},{m:'2025-04',c:'Jatin',a:300.0},{m:'2025-04',c:'Satish P',a:299.0},{m:'2025-04',c:'Svetlana',a:200.0},{m:'2025-04',c:'Ahmed',a:350.0},{m:'2025-04',c:'Haneesh Krishnan',a:311.0},{m:'2025-04',c:'Nathan B',a:299.0},{m:'2025-04',c:'Adrian #5',a:300.0},{m:'2025-04',c:'Seda Byrant',a:1342.0},{m:'2025-04',c:'Narayan',a:1199.0},{m:'2025-04',c:'David A',a:350.0},{m:'2025-04',c:'Rocky Aviles',a:762.0},{m:'2025-04',c:'Modupe Famodimu',a:750.0},{m:'2025-04',c:'Yue Wu #2',a:300.0},{m:'2025-04',c:'Vishnu Sharma',a:150.0},{m:'2025-04',c:'Yue Wu #4',a:649.0},{m:'2025-04',c:'Sigmond',a:300.0},{m:'2025-04',c:'Peyman H',a:150.0},{m:'2025-04',c:'Sudhakar',a:600.0},{m:'2025-04',c:'Xufen Tu - PCT',a:500.0},{m:'2025-05',c:'Hamilton',a:501.0},{m:'2025-05',c:'Mark Adams',a:800.0},{m:'2025-05',c:'Svetlana',a:460.0},{m:'2025-05',c:'Sigmond',a:300.0},{m:'2025-05',c:'Hubert',a:250.0},{m:'2025-05',c:'Xufen Tu',a:400.0},{m:'2025-05',c:'Adrian',a:300.0},{m:'2025-05',c:'David A',a:400.0},{m:'2025-06',c:'Adrian',a:300.0},{m:'2025-06',c:'Adrian',a:300.0},{m:'2025-06',c:'Hamilton',a:501.0},{m:'2025-06',c:'Xufen Tu',a:350.0},{m:'2025-06',c:'Giovanni Vestita',a:100.0},{m:'2025-06',c:'Hubert',a:250.0},{m:'2025-06',c:'Chris',a:850.0},{m:'2025-07',c:'Patrick Brenner',a:430.0},{m:'2025-07',c:'Franco Di Pasquale',a:300.0},{m:'2025-07',c:'Danny G',a:600.0},{m:'2025-07',c:'Robert Jackson',a:750.0},{m:'2025-07',c:'Rocky Aviles',a:632.0},{m:'2025-07',c:'Narayanan',a:650.0},{m:'2025-07',c:'Syed Abedi',a:600.0},{m:'2025-07',c:'Adrian',a:450.0},{m:'2025-07',c:'Patrica Charles',a:500.0},{m:'2025-07',c:'Adrian',a:550.0},{m:'2025-07',c:'Hamilton',a:501.0},{m:'2025-08',c:'Austin',a:300.0},{m:'2025-08',c:'Austin',a:500.0},{m:'2025-08',c:'Brent Accent',a:1319.0},{m:'2025-08',c:'Kaniwar Ali',a:600.0},{m:'2025-08',c:'Abhinay',a:361.0},{m:'2025-08',c:'Nandamuri',a:350.0},{m:'2025-08',c:'Sriram',a:2250.0},{m:'2025-08',c:'Jordan',a:300.0},{m:'2025-08',c:'Patrick Brenner',a:1067.0},{m:'2025-08',c:'Hamilton',a:300.0},{m:'2025-08',c:'Jordan',a:300.0},{m:'2025-08',c:'Danny G',a:450.0},{m:'2025-08',c:'Haneesh Krishnan',a:400.0},{m:'2025-09',c:'Sharion',a:450.0},{m:'2025-09',c:'Sharion',a:250.0},{m:'2025-09',c:'Mark Adams',a:450.0},{m:'2025-09',c:'Chang Liow',a:750.0},{m:'2025-09',c:'Franco',a:300.0},{m:'2025-09',c:'Mahendra',a:750.0},{m:'2025-09',c:'Haneesh Krishnan',a:450.0},{m:'2025-09',c:'Robert Jacksion',a:600.0},{m:'2025-09',c:'Kaniwar Ali',a:1300.0},{m:'2025-09',c:'Yue Wu',a:300.0},{m:'2025-09',c:'Giovanni Vestita',a:400.0},{m:'2025-10',c:'Shantanu Singh',a:680.0},{m:'2025-10',c:'IIPLA',a:300.0},{m:'2025-10',c:'IIPLA',a:400.0},{m:'2025-10',c:'Ahmed Kalli',a:750.0},{m:'2025-10',c:'Ernie DeMartino',a:1200.0},{m:'2025-10',c:'Giri',a:250.0},{m:'2025-10',c:'Ahmed Kalli',a:1000.0},{m:'2025-10',c:'Hubert',a:800.0},{m:'2025-10',c:'Abhinay',a:300.0},{m:'2025-10',c:'Adrian',a:500.0},{m:'2025-10',c:'Rocky',a:300.0},{m:'2025-10',c:'Patrick Brenner',a:460.0},{m:'2025-10',c:'Xufen Tu',a:1100.0},{m:'2025-10',c:'Robert Jackson',a:300.0},{m:'2025-10',c:'Giovanni Vestita',a:350.0},{m:'2025-10',c:'Sharian',a:849.0},{m:'2025-11',c:'Kundan Krishna',a:350.0},{m:'2025-11',c:'Keerthana Kalyan',a:350.0},{m:'2025-11',c:'Vinuraj Devaraj',a:350.0},{m:'2025-11',c:'Hubert',a:500.0},{m:'2025-11',c:'Narayanan',a:1000.0},{m:'2025-11',c:'IIPLA',a:400.0},{m:'2025-11',c:'Mahendra',a:300.0},{m:'2025-11',c:'Jordan',a:100.0},{m:'2025-11',c:'Adrian',a:350.0},{m:'2025-12',c:'Medhat Akter',a:400.0},{m:'2025-12',c:'Ravi Kishore',a:800.0},{m:'2025-12',c:'Sumi Dynex',a:402.0},{m:'2025-12',c:'Canberk Gurel',a:203.0},{m:'2025-12',c:'Mark Wenderlich',a:355.0},{m:'2025-12',c:'Sumi Dynex',a:200.0},{m:'2025-12',c:'Canberk Gurel',a:105.0},{m:'2025-12',c:'Chang Liow',a:1000.0},{m:'2025-12',c:'Seda Bryant',a:508.0},{m:'2025-12',c:'Keerthana Kalyan',a:1000.0},{m:'2025-12',c:'Kundan Krishna',a:1900.0},{m:'2025-12',c:'Kundan Krishna',a:350.0},{m:'2025-12',c:'Vinuraj Devaraj',a:300.0},{m:'2025-12',c:'Sriram',a:750.0},{m:'2025-12',c:'Srilaxmi N',a:3398.0},{m:'2025-12',c:'IIPLA',a:300.0},{m:'2025-12',c:'Hubert',a:500.0},{m:'2025-12',c:'IIPLA',a:350.0},{m:'2025-12',c:'Keerthana Kalyan',a:900.0},{m:'2026-01',c:'Kenneth',a:300.0},{m:'2026-01',c:'Shantanu Singh',a:500.0},{m:'2026-01',c:'Kundan Krishna',a:400.0},{m:'2026-01',c:'Ben S',a:750.0},{m:'2026-01',c:'Todd',a:1000.0},{m:'2026-02',c:'Marie',a:350.0},{m:'2026-02',c:'David L',a:1550.0},{m:'2026-02',c:'Todd',a:500.0},{m:'2026-02',c:'IIPLA',a:450.0},{m:'2026-02',c:'Shantanu S',a:350.0},{m:'2026-02',c:'Syed',a:900.0},{m:'2026-02',c:'IIPLA',a:400.0},{m:'2026-03',c:'Rossi',a:300.0},{m:'2026-03',c:'Beyond Solar',a:355.0},{m:'2026-03',c:'Sigmond',a:1600.0},{m:'2026-03',c:'Wilson',a:450.0},{m:'2026-03',c:'Medant Aker',a:1990.0},{m:'2026-03',c:'Joseph B',a:500.0},{m:'2026-03',c:'Wilson',a:300.0},{m:'2026-03',c:'Pranos',a:400.0},{m:'2026-04',c:'Marcel Riera',a:252.0},{m:'2026-04',c:'Terrence Gonzalez',a:355.0},{m:'2026-04',c:'Jordi',a:252.0},{m:'2026-04',c:'Donny',a:313.0},{m:'2026-04',c:'Alan',a:758.0},{m:'2026-04',c:'Venkatesh Ganta',a:250.0},{m:'2026-04',c:'Jordan',a:1150.0},{m:'2026-04',c:'Joseph B',a:800.0},{m:'2026-04',c:'Rocky',a:2575.0},{m:'2026-04',c:'Ben Snipe',a:750.0},{m:'2026-04',c:'Gilmore',a:750.0},{m:'2026-04',c:'IIPLA',a:500.0},{m:'2026-04',c:'Sigmond',a:760.0},{m:'2026-04',c:'Joseph B',a:800.0},{m:'2026-04',c:'Jordan',a:900.0},{m:'2026-04',c:'Sharion',a:650.0},{m:'2026-04',c:'IIPLA',a:125.0},{m:'2026-04',c:'Narayanan',a:1399.0},{m:'2026-04',c:'Jim S',a:500.0},{m:'2026-05',c:'Richard',a:300.0},{m:'2026-05',c:'Oleg Podegesary',a:300.0},{m:'2026-05',c:'Wille David',a:352.0},{m:'2026-05',c:'Bifang',a:1850.0},{m:'2026-05',c:'Mouna',a:352.0},{m:'2026-05',c:'Venkatesh Ganta',a:650.0},{m:'2026-05',c:'Paul D',a:750.0},{m:'2026-05',c:'RP C',a:750.0},{m:'2026-05',c:'Vishnu S',a:300.0},{m:'2026-05',c:'Venkatesh Ganta',a:2574.0},{m:'2026-05',c:'Jordi',a:262.0},{m:'2026-06',c:'Ruffin',a:353.0},{m:'2026-06',c:'Angelina',a:353.0},{m:'2026-06',c:'Will Davis',a:350.0},{m:'2026-06',c:'Yash',a:353.0},{m:'2026-06',c:'Sumi Dynex',a:910.0},{m:'2026-06',c:'Felipe Parthika',a:353.0},{m:'2026-06',c:'Novojuris',a:3000.0},{m:'2026-06',c:'Anand',a:1270.0},{m:'2026-06',c:'Jagan Reddy',a:203.0},{m:'2026-06',c:'IIPLA',a:400.0},{m:'2026-06',c:'IIPLA',a:400.0},{m:'2026-06',c:'Jordan',a:100.0},{m:'2026-06',c:'Ramesh',a:50.0},{m:'2026-06',c:'Felipe P',a:910.0},{m:'2026-06',c:'Chang',a:300.0},{m:'2026-06',c:'RP C',a:750.0},{m:'2026-06',c:'IIPLA',a:350.0},{m:'2026-06',c:'Yue Wu',a:300.0},{m:'2026-06',c:'Angelina',a:810.0},{m:'2026-06',c:'CG Venkatesh',a:500.0},{m:'2026-07',c:'Jacques Lepine',a:1100.0},{m:'2026-07',c:'CONSERBELLA BOX',a:350.0},{m:'2026-07',c:'Tom Clark',a:310.0},{m:'2026-07',c:'James Bolding',a:355.0},{m:'2026-07',c:'Sai Teja Tavva',a:1150.0},{m:'2026-07',c:'Toby Weston',a:534.0},{m:'2026-07',c:'Toby Weston',a:216.0},{m:'2026-07',c:'RP C',a:750.0},{m:'2026-07',c:'Xufen TU',a:150.0},{m:'2026-07',c:'Wille Davis',a:300.0},{m:'2026-07',c:'Srilaxmi N',a:500.0},{m:'2026-07',c:'Sigmond Smith',a:750.0},{m:'2026-07',c:'Anand V',a:810.0},{m:'2026-07',c:'Angelina D',a:1100.0},{m:'2026-07',c:'Yash',a:310.0},{m:'2026-07',c:'IIPLA',a:150.0},{m:'2026-07',c:'Ruffin',a:810.0},{m:'2026-07',c:'Jagan Reddy',a:105.0},{m:'2026-07',c:'Sudhakar Rao',a:1000.0},{m:'2026-07',c:'Anand V',a:700.0},{m:'2026-08',c:'Geoffrey Weckx',a:355.0},{m:'2026-08',c:'Praveen G (India)',a:500.0},{m:'2026-08',c:'Raghavendhra (India)',a:842.11},{m:'2026-08',c:'Paul Nevis',a:300.0},{m:'2026-08',c:'Quant Ai',a:350.0},{m:'2026-08',c:'Murali TechCommands',a:355.0},{m:'2026-08',c:'Paul Nevis',a:300.0},{m:'2026-08',c:'Paul Nevis',a:300.0},{m:'2026-08',c:'Geoffrey Weckx',a:800.0},{m:'2026-08',c:'Quant Ai',a:800.0},{m:'2026-08',c:'Sudhakar Rao',a:500.0},{m:'2026-08',c:'IIPLA',a:425.0},{m:'2026-08',c:'Toby Weston',a:2000.0},{m:'2026-08',c:'Danny',a:900.0}];
 
   function toast(msg){
     const t = $('toast');
@@ -889,6 +1750,11 @@ window.storage = {
       if (cl && cl.value){ clients = JSON.parse(cl.value); }
     }catch(e){ clients = []; }
 
+    try{
+      const sv = await window.storage.get('services', false);
+      if (sv && sv.value){ services = JSON.parse(sv.value); }
+    }catch(e){ services = []; }
+
     // Migrate old single bank-account fields (bankAccountName, bankName, ...)
     // into the new bankAccounts array — never lose an existing saved account.
     if (!company.bankAccounts || !company.bankAccounts.length){
@@ -921,6 +1787,31 @@ window.storage = {
       company.defaultBankAccountId = company.bankAccounts[0].id;
     }
 
+    let loadedPayments = false;
+    try{
+      const pay = await window.storage.get('payments', false);
+      if (pay && pay.value){ payments = JSON.parse(pay.value); loadedPayments = true; }
+    }catch(e){ payments = []; }
+
+    // First-ever load: seed the payments ledger from the user's historical
+    // billing spreadsheet so the dashboard starts with real history instead
+    // of empty. Only runs once — after this, 'payments' always exists in
+    // storage (even as []), so this block never re-triggers.
+    if (!loadedPayments){
+      payments = HISTORICAL_PAYMENTS.map(r => ({
+        id: uid(),
+        date: r.m + '-01',
+        client: r.c,
+        amount: r.a,
+        bankAccountId: null, // not tracked at the time — tag later if useful
+        invoiceId: null,
+        method: 'Historical import',
+        notes: '',
+        createdAt: Date.now()
+      }));
+      await persistPayments();
+    }
+
     if (!loadedCompany){
       await persistCompany();
     }
@@ -943,6 +1834,14 @@ window.storage = {
   async function persistClients(){
     try{ await window.storage.set('clients', JSON.stringify(clients), false); }
     catch(e){ toast('Could not save client list'); }
+  }
+  async function persistServices(){
+    try{ await window.storage.set('services', JSON.stringify(services), false); }
+    catch(e){ toast('Could not save services list'); }
+  }
+  async function persistPayments(){
+    try{ await window.storage.set('payments', JSON.stringify(payments), false); }
+    catch(e){ toast('Could not save payment — try again'); }
   }
 
   // ---------- BRAND / LEDGER ----------
@@ -998,7 +1897,7 @@ window.storage = {
   }
 
   // ---------- LINE ITEMS ----------
-  function newItem(){ return {id:uid(), desc:'', price:0, qty:1}; }
+  function newItem(){ return {id:uid(), desc:'', price:0, qty:1, discountable:true}; }
 
   // Removes rows that were added but never actually filled in (no description
   // and no price), so blank placeholder rows don't get saved or printed as
@@ -1025,11 +1924,20 @@ window.storage = {
         <td><input type="number" class="num" value="${it.price}" min="0" step="0.01" data-field="price" data-id="${it.id}"></td>
         <td><input type="number" class="num" value="${it.qty}" min="0" step="1" data-field="qty" data-id="${it.id}"></td>
         <td class="amount-cell">${money(amount)}</td>
+        <td class="discount-col no-print" style="text-align:center;">
+          <input type="checkbox" class="item-discount-check" data-id="${it.id}" ${it.discountable !== false ? 'checked' : ''} title="Eligible for discount">
+        </td>
         <td><button class="row-remove no-print" data-id="${it.id}" title="Remove line">✕</button></td>
       `;
       body.appendChild(tr);
     });
-    body.querySelectorAll('input').forEach(inp=> inp.addEventListener('input', onItemInput));
+    body.querySelectorAll('input[type="number"], input[type="text"]').forEach(inp=> inp.addEventListener('input', onItemInput));
+    body.querySelectorAll('.item-discount-check').forEach(chk=>{
+      chk.addEventListener('change', ()=>{
+        const it = items.find(i=>i.id===chk.dataset.id);
+        if (it){ it.discountable = chk.checked; recalcTotals(); }
+      });
+    });
     body.querySelectorAll('textarea.desc-field').forEach(ta=>{
       ta.addEventListener('input', onItemInput);
       autoGrowDesc(ta); // size correctly for existing content on render
@@ -1061,11 +1969,35 @@ window.storage = {
   }
 
   function recalcTotals(){
-    const total = items.reduce((s,it)=> s + (parseFloat(it.price)||0)*(parseFloat(it.qty)||0), 0);
+    const subtotal = items.reduce((s,it)=> s + (parseFloat(it.price)||0)*(parseFloat(it.qty)||0), 0);
+    const discountableBase = items.reduce((s,it)=> it.discountable !== false ? s + (parseFloat(it.price)||0)*(parseFloat(it.qty)||0) : s, 0);
     const currency = company.currency || '$';
+
+    const discountEnabled = $('discountEnabledCheckbox').checked;
+    const discountType = $('discountTypeSelect').value;
+    const discountValueRaw = parseFloat($('discountValueField').value)||0;
+    let discountAmount = 0;
+    if (discountEnabled && discountValueRaw > 0){
+      discountAmount = discountType === 'percent' ? discountableBase * (discountValueRaw/100) : discountValueRaw;
+      discountAmount = Math.max(0, Math.min(discountAmount, discountableBase)); // never discount below zero or past the discountable items themselves
+    }
+    const total = subtotal - discountAmount;
+    const showDiscountRows = discountEnabled && discountAmount > 0;
+
+    $('itemsTable').classList.toggle('show-discount-col', discountEnabled);
+    $('subtotalRow').style.display = showDiscountRows ? '' : 'none';
+    $('discountRow').style.display = showDiscountRows ? '' : 'none';
+    $('subtotalVal').textContent = currency + money(subtotal);
+    const customNote = $('discountNoteField').value.trim();
+    const defaultLabel = discountType === 'percent'
+      ? `${discountValueRaw}% discount applied at your request`
+      : 'Discount applied at your request';
+    $('discountLabelCell').textContent = customNote || defaultLabel;
+    $('discountVal').textContent = '-' + currency + money(discountAmount);
+
     $('totalVal').textContent = currency + money(total);
     $('amountWords').textContent = `(${numberToWords(total)} ${company.currencyWords||'US Dollars'} Only)`;
-    return { total };
+    return { total, subtotal, discountAmount, discountEnabled, discountType, discountValue: discountValueRaw, discountNote: customNote };
   }
 
   // ---------- REMITTANCE RENDER ----------
@@ -1149,6 +2081,8 @@ window.storage = {
     $('invoiceWordEl').textContent = isInvoice ? 'INVOICE' : 'ESTIMATE';
     $('totalLabelCell').textContent = isInvoice ? 'TOTAL' : 'ESTIMATED TOTAL';
     $('receivedFieldWrap').style.display = isInvoice ? '' : 'none';
+    $('recordPaymentFromInvoiceBtn').style.display = isInvoice ? '' : 'none';
+    $('dueDateRow').style.display = isInvoice ? '' : 'none';
     $('saveBtn').textContent = isInvoice ? 'Save invoice' : 'Save estimate';
     // Convert to Invoice only makes sense for a saved (already-persisted) estimate
     $('convertBtn').style.display = (!isInvoice && currentId) ? '' : 'none';
@@ -1181,12 +2115,27 @@ window.storage = {
     }
   }
 
+  // Resets or loads the discount controls. Discount is off by default for
+  // every new document — it only appears on the ones you explicitly turn it
+  // on for, so regular clients never see a discount line they didn't get.
+  function setDiscountUI(doc){
+    const enabled = !!(doc && doc.discountEnabled);
+    $('discountEnabledCheckbox').checked = enabled;
+    $('discountTypeSelect').value = (doc && doc.discountType) || 'percent';
+    $('discountValueField').value = (doc && doc.discountValue) || '';
+    $('discountNoteField').value = (doc && doc.discountNote) || '';
+    $('discountTypeSelect').style.display = enabled ? '' : 'none';
+    $('discountValueField').style.display = enabled ? '' : 'none';
+    $('discountNoteField').style.display = enabled ? '' : 'none';
+  }
+
   function newDocument(type){
     docType = type;
     currentId = null;
     items = [newItem()];
     $('invoiceNumber').value = blankNumber(type);
     $('invoiceDate').value = todayStr();
+    $('dueDateField').value = type === 'invoice' ? todayStr(30) : '';
     $('fromName').value = company.name || '';
     $('fromDetails').value = company.details || '';
     $('toName').value = '';
@@ -1199,6 +2148,7 @@ window.storage = {
     $('amountPaidField').value = 0;
     $('toolbarTitle').textContent = type === 'invoice' ? 'New invoice' : 'New estimate';
     currentBankAccountId = (company && company.defaultBankAccountId) || null;
+    setDiscountUI(null);
     applyDocTypeUI();
     renderItems();
     renderClientPicker();
@@ -1218,6 +2168,7 @@ window.storage = {
     if (items.length===0) items = [newItem()];
     $('invoiceNumber').value = doc.number;
     $('invoiceDate').value = doc.date;
+    $('dueDateField').value = doc.dueDate || '';
     $('fromName').value = doc.fromName;
     $('fromDetails').value = doc.fromDetails;
     $('toName').value = doc.toName;
@@ -1230,6 +2181,7 @@ window.storage = {
     $('toolbarTitle').textContent = doc.number;
     $('clientPicker').value = '';
     currentBankAccountId = doc.bankAccountId || (company && company.defaultBankAccountId) || null;
+    setDiscountUI(doc);
     applyDocTypeUI();
     renderItems();
     renderClientPicker();
@@ -1254,11 +2206,17 @@ window.storage = {
       notes: $('notesField').value,
       status: $('statusSelect').value,
       total: totals.total,
+      subtotal: totals.subtotal,
+      discountEnabled: totals.discountEnabled,
+      discountType: totals.discountType,
+      discountValue: totals.discountValue,
+      discountNote: totals.discountNote,
       updatedAt: Date.now()
     };
     if (docType === 'invoice'){
       base.amountPaid = parseFloat($('amountPaidField').value)||0;
       base.bankAccountId = currentBankAccountId || (company && company.defaultBankAccountId) || null;
+      base.dueDate = $('dueDateField').value || '';
     }
     return base;
   }
@@ -1328,6 +2286,7 @@ window.storage = {
     currentId = null;
     $('invoiceNumber').value = blankNumber(docType);
     $('invoiceDate').value = todayStr();
+    $('dueDateField').value = docType === 'invoice' ? todayStr(30) : '';
     $('statusSelect').value = 'Draft';
     $('amountPaidField').value = 0;
     $('toolbarTitle').textContent = (docType === 'invoice' ? 'New invoice' : 'New estimate') + ' (copy)';
@@ -1354,6 +2313,7 @@ window.storage = {
     if (items.length===0) items = [newItem()];
     $('invoiceNumber').value = blankNumber('invoice');
     $('invoiceDate').value = todayStr();
+    $('dueDateField').value = todayStr(30);
     $('fromName').value = company.name || '';
     $('fromDetails').value = company.details || '';
     $('toName').value = est.toName;
@@ -1364,8 +2324,12 @@ window.storage = {
     $('statusSelect').value = 'Draft';
     $('amountPaidField').value = 0;
     $('toolbarTitle').textContent = 'New invoice (from estimate)';
+    currentBankAccountId = (company && company.defaultBankAccountId) || null;
+    setDiscountUI(est);
     applyDocTypeUI();
     renderItems();
+    renderClientPicker();
+    renderBankAccountSelect();
     renderRemit();
     recalcTotals();
     renderLedger();
@@ -1529,6 +2493,7 @@ window.storage = {
   $('newInvoiceBtn').addEventListener('click', ()=>{ showEditor(); newDocument('invoice'); });
   $('newEstimateBtn').addEventListener('click', ()=>{ showEditor(); newDocument('estimate'); });
   $('homeBtn').addEventListener('click', showDashboard);
+  $('paymentsBtn').addEventListener('click', showPayments);
   $('saveBtn').addEventListener('click', saveDocument);
   $('deleteBtn').addEventListener('click', deleteDocument);
   $('duplicateBtn').addEventListener('click', duplicateDocument);
@@ -1552,6 +2517,34 @@ window.storage = {
     window.print();
   });
   $('addRowBtn').addEventListener('click', ()=>{ items.push(newItem()); renderItems(); });
+
+  $('discountEnabledCheckbox').addEventListener('change', ()=>{
+    const on = $('discountEnabledCheckbox').checked;
+    $('discountTypeSelect').style.display = on ? '' : 'none';
+    $('discountValueField').style.display = on ? '' : 'none';
+    $('discountNoteField').style.display = on ? '' : 'none';
+    if (!on){ $('discountValueField').value = ''; $('discountNoteField').value = ''; }
+    recalcTotals();
+  });
+  $('discountTypeSelect').addEventListener('change', recalcTotals);
+  $('discountValueField').addEventListener('input', recalcTotals);
+  $('discountNoteField').addEventListener('input', recalcTotals);
+
+  $('servicePickerSelect').addEventListener('change', (e)=>{
+    const id = e.target.value;
+    if (!id) return;
+    const svc = services.find(s=>s.id===id);
+    if (svc){
+      items.push({ id: uid(), desc: svc.name, price: svc.price, qty: 1 });
+      renderItems();
+      recalcTotals();
+    }
+    e.target.value = '';
+  });
+  $('manageServicesBtn').addEventListener('click', openServicesModal);
+  $('closeServicesModal').addEventListener('click', closeServicesModal);
+  $('servicesModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='servicesModalOverlay') closeServicesModal(); });
+  $('addServiceBtn').addEventListener('click', addService);
   $('statusSelect').addEventListener('change', ()=>{
     if (docType !== 'invoice') return; // Received-amount auto-fill only applies to invoices
     const status = $('statusSelect').value;
@@ -1569,6 +2562,38 @@ window.storage = {
   $('cancelCompanyModal').addEventListener('click', closeCompanyModal);
   $('saveCompanyModal').addEventListener('click', saveCompanyModal);
   $('companyModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='companyModalOverlay') closeCompanyModal(); });
+
+  $('recordPaymentFromInvoiceBtn').addEventListener('click', ()=>{
+    if (!currentId){
+      toast('Save this invoice first, then record the payment');
+      return;
+    }
+    const totals = recalcTotals();
+    const alreadyPaid = parseFloat($('amountPaidField').value)||0;
+    const remaining = Math.max(totals.total - alreadyPaid, 0);
+    openPaymentModal(null);
+    $('payClient').value = $('toName').value || '';
+    $('payAmount').value = (remaining > 0 ? remaining : totals.total).toFixed(2);
+    $('payAccount').value = currentBankAccountId || company.defaultBankAccountId || '';
+    $('payInvoice').value = currentId;
+  });
+
+  $('cancelPaymentModal').addEventListener('click', closePaymentModal);
+  $('savePaymentModal').addEventListener('click', savePaymentModal);
+  $('deletePaymentBtn').addEventListener('click', deletePaymentModal);
+  $('paymentModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='paymentModalOverlay') closePaymentModal(); });
+
+  $('downloadBackupBtn').addEventListener('click', downloadFullBackup);
+
+  $('closeClientProfileBtn').addEventListener('click', closeClientProfile);
+  $('clientProfileModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='clientProfileModalOverlay') closeClientProfile(); });
+  // Client names are rendered dynamically in several places (payments table,
+  // aging list, part-payments list) — one delegated listener on the document
+  // covers all of them instead of re-binding after every render.
+  document.addEventListener('click', (e)=>{
+    const link = e.target.closest('.client-link');
+    if (link && link.dataset.client) openClientProfile(link.dataset.client);
+  });
 
   $('logoUploadBtn').addEventListener('click', ()=> $('logoFileInput').click());
   $('sigUploadBtn').addEventListener('click', ()=> $('sigFileInput').click());
@@ -1595,6 +2620,7 @@ window.storage = {
   // ---------- INIT ----------
   (async function init(){
     await loadAll();
+    renderServicePicker();
     newDocument('invoice');
     showDashboard();
   })();

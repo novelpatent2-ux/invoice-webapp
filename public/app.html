@@ -409,6 +409,8 @@
 
     <button class="nav-home-btn" id="homeBtn">🏠 Home</button>
     <button class="nav-home-btn" id="paymentsBtn">💰 Payments</button>
+    <button class="nav-home-btn" id="invoicesListBtn">🧾 All Invoices</button>
+    <button class="nav-home-btn" id="revenueBtn">📈 Revenue</button>
     <button class="new-invoice-btn" id="newInvoiceBtn">+ New invoice</button>
     <button class="new-estimate-btn" id="newEstimateBtn">+ New estimate</button>
 
@@ -437,6 +439,22 @@
         <div class="dashboard-sub">Every payment received, and which account it landed in</div>
       </div>
       <div id="paymentsBody"></div>
+    </div>
+
+    <div id="invoicesListView" class="dashboard-view">
+      <div class="dashboard-header">
+        <div class="dashboard-title">All Invoices</div>
+        <div class="dashboard-sub">Every invoice you've ever created, in one list</div>
+      </div>
+      <div id="invoicesListBody"></div>
+    </div>
+
+    <div id="revenueView" class="dashboard-view">
+      <div class="dashboard-header">
+        <div class="dashboard-title">Revenue</div>
+        <div class="dashboard-sub">What you actually earned — official/pass-through fees kept out of the number</div>
+      </div>
+      <div id="revenueBody"></div>
     </div>
 
     <div id="editorView">
@@ -503,10 +521,11 @@
           <thead>
             <tr>
               <th class="idx">#</th>
-              <th style="width:40%">Item Description</th>
-              <th class="num" style="width:14%">Price (USD)</th>
-              <th class="num" style="width:14%">Quantity</th>
-              <th class="num" style="width:17%">Amount (USD)</th>
+              <th style="width:36%">Item Description</th>
+              <th class="num" style="width:13%">Price (USD)</th>
+              <th class="num" style="width:12%">Quantity</th>
+              <th class="num" style="width:15%">Amount (USD)</th>
+              <th class="no-print" style="width:9%;text-align:center;" title="Counts toward your revenue reports — uncheck for pass-through costs like official/USPTO fees">Revenue</th>
               <th class="discount-col no-print" style="width:9%;text-align:center;">Disc.</th>
               <th style="width:4%"></th>
             </tr>
@@ -516,18 +535,21 @@
             <tr id="subtotalRow" style="display:none;">
               <td class="total-label subtotal-label" colspan="4">Subtotal</td>
               <td id="subtotalVal">$0.00</td>
+              <td class="no-print"></td>
               <td class="discount-col no-print"></td>
               <td class="no-print"></td>
             </tr>
             <tr id="discountRow" style="display:none;">
               <td class="total-label subtotal-label" colspan="4" id="discountLabelCell">Discount</td>
               <td id="discountVal">-$0.00</td>
+              <td class="no-print"></td>
               <td class="discount-col no-print"></td>
               <td class="no-print"></td>
             </tr>
             <tr>
               <td class="total-label" id="totalLabelCell" colspan="4">TOTAL</td>
               <td id="totalVal">$0.00</td>
+              <td class="no-print"></td>
               <td class="discount-col no-print"></td>
               <td class="no-print"></td>
             </tr>
@@ -766,6 +788,9 @@
         <input id="newServicePrice" type="number" min="0" step="0.01" placeholder="0.00">
       </div>
     </div>
+    <label style="font-size:12.5px;display:flex;gap:6px;align-items:center;margin:-6px 0 14px;">
+      <input type="checkbox" id="newServiceIsRevenue" checked> Counts toward revenue (uncheck for pass-through costs like official/USPTO fees)
+    </label>
     <button class="upload-btn" id="addServiceBtn" type="button" style="margin-bottom:16px;">+ Add service</button>
     <div class="modal-actions">
       <button class="btn btn-primary" id="closeServicesModal">Done</button>
@@ -848,26 +873,64 @@ window.storage = {
   function showDashboard(){
     $('dashboardView').classList.add('show');
     $('paymentsView').classList.remove('show');
+    $('invoicesListView').classList.remove('show');
+    $('revenueView').classList.remove('show');
     $('editorView').classList.add('hidden');
     $('homeBtn').classList.add('active');
     $('paymentsBtn').classList.remove('active');
+    $('invoicesListBtn').classList.remove('active');
+    $('revenueBtn').classList.remove('active');
     renderDashboard();
   }
   function showEditor(){
     $('dashboardView').classList.remove('show');
     $('paymentsView').classList.remove('show');
+    $('invoicesListView').classList.remove('show');
+    $('revenueView').classList.remove('show');
     $('editorView').classList.remove('hidden');
     $('homeBtn').classList.remove('active');
     $('paymentsBtn').classList.remove('active');
+    $('invoicesListBtn').classList.remove('active');
+    $('revenueBtn').classList.remove('active');
   }
 
   function showPayments(){
     $('dashboardView').classList.remove('show');
+    $('invoicesListView').classList.remove('show');
+    $('revenueView').classList.remove('show');
     $('editorView').classList.add('hidden');
     $('paymentsView').classList.add('show');
     $('homeBtn').classList.remove('active');
     $('paymentsBtn').classList.add('active');
+    $('invoicesListBtn').classList.remove('active');
+    $('revenueBtn').classList.remove('active');
     renderPayments();
+  }
+
+  function showInvoicesList(){
+    $('dashboardView').classList.remove('show');
+    $('paymentsView').classList.remove('show');
+    $('revenueView').classList.remove('show');
+    $('editorView').classList.add('hidden');
+    $('invoicesListView').classList.add('show');
+    $('homeBtn').classList.remove('active');
+    $('paymentsBtn').classList.remove('active');
+    $('invoicesListBtn').classList.add('active');
+    $('revenueBtn').classList.remove('active');
+    renderInvoicesList();
+  }
+
+  function showRevenue(){
+    $('dashboardView').classList.remove('show');
+    $('paymentsView').classList.remove('show');
+    $('invoicesListView').classList.remove('show');
+    $('editorView').classList.add('hidden');
+    $('revenueView').classList.add('show');
+    $('homeBtn').classList.remove('active');
+    $('paymentsBtn').classList.remove('active');
+    $('invoicesListBtn').classList.remove('active');
+    $('revenueBtn').classList.add('active');
+    renderRevenue();
   }
 
   function accountLabelById(id){
@@ -1060,13 +1123,143 @@ window.storage = {
     });
   }
 
-  function populatePaymentModalDropdowns(){
+  // ---------- ALL INVOICES ----------
+  function getInvoiceListFilters(){
+    return {
+      status: $('ilStatus') ? $('ilStatus').value : '',
+      from: $('ilFrom') ? $('ilFrom').value : '',
+      to: $('ilTo') ? $('ilTo').value : '',
+      client: $('ilClient') ? $('ilClient').value.trim().toLowerCase() : ''
+    };
+  }
+
+  function filteredInvoicesList(){
+    const f = getInvoiceListFilters();
+    return invoices.filter(inv=>{
+      if (f.status && inv.status !== f.status) return false;
+      if (f.from && (inv.date||'') < f.from) return false;
+      if (f.to && (inv.date||'') > f.to) return false;
+      if (f.client && !(inv.toName||'').toLowerCase().includes(f.client)) return false;
+      return true;
+    }).sort((a,b)=> (b.date||'').localeCompare(a.date||'') || (b.updatedAt||0)-(a.updatedAt||0));
+  }
+
+  function renderInvoicesList(){
+    const body = $('invoicesListBody');
+    const currency = company.currency || '$';
+
+    if (invoices.length === 0){
+      body.innerHTML = `<div class="dashboard-empty">No invoices yet. Create your first invoice to see it here.</div>`;
+      return;
+    }
+
+    const prevFilters = getInvoiceListFilters();
+    const rows = filteredInvoicesList();
+    const statuses = ['Draft','Sent','Partial','Paid','Overdue'];
+
+    body.innerHTML = `
+      <div class="payments-toolbar">
+        <div></div>
+        <button class="btn" id="downloadInvoicesListBtn">⬇ Download Excel</button>
+      </div>
+
+      <div class="payments-filters">
+        <div class="pf-group">
+          <label>Status</label>
+          <select id="ilStatus">
+            <option value="">All statuses</option>
+            ${statuses.map(s=>`<option value="${s}">${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="pf-group">
+          <label>From</label>
+          <input type="date" id="ilFrom" value="${escapeAttr(prevFilters.from)}">
+        </div>
+        <div class="pf-group">
+          <label>To</label>
+          <input type="date" id="ilTo" value="${escapeAttr(prevFilters.to)}">
+        </div>
+        <div class="pf-group">
+          <label>Client</label>
+          <input type="text" id="ilClient" placeholder="Search client" value="${escapeAttr(prevFilters.client)}">
+        </div>
+        <button class="pf-clear" id="ilClear">Clear filters</button>
+      </div>
+
+      <div class="payments-table-wrap">
+        <table class="payments-table">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Date</th>
+              <th>Due</th>
+              <th>Client</th>
+              <th>Status</th>
+              <th style="text-align:right;">Total</th>
+              <th style="text-align:right;">Received</th>
+              <th style="text-align:right;">Outstanding</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.length === 0 ? `<tr><td colspan="8" class="payments-empty-cell">No invoices match these filters.</td></tr>` :
+              rows.map(inv=>{
+                const received = parseFloat(inv.amountPaid)||0;
+                const outstanding = Math.max((inv.total||0) - received, 0);
+                return `
+                  <tr data-id="${inv.id}" class="il-row" style="cursor:pointer;">
+                    <td>${escapeAttr(inv.number)}</td>
+                    <td>${escapeAttr(inv.date||'')}</td>
+                    <td>${escapeAttr(inv.dueDate||'—')}</td>
+                    <td><span class="client-link" data-client="${escapeAttr(inv.toName||'')}">${escapeAttr(inv.toName||'Untitled client')}</span></td>
+                    <td><span class="ledger-dot ${statusDotClass(inv.status)}"></span>${escapeAttr(inv.status)}</td>
+                    <td class="pt-amt">${currency}${money(inv.total||0)}</td>
+                    <td class="pt-amt">${currency}${money(received)}</td>
+                    <td class="pt-amt">${currency}${money(outstanding)}</td>
+                  </tr>
+                `;
+              }).join('')
+            }
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    $('downloadInvoicesListBtn').addEventListener('click', ()=>downloadInvoicesListExcel(filteredInvoicesList()));
+    $('ilStatus').addEventListener('change', renderInvoicesList);
+    $('ilFrom').addEventListener('input', renderInvoicesList);
+    $('ilTo').addEventListener('input', renderInvoicesList);
+    $('ilClient').addEventListener('input', renderInvoicesList);
+    $('ilStatus').value = prevFilters.status;
+    $('ilClear').addEventListener('click', ()=>{
+      $('ilStatus').value=''; $('ilFrom').value=''; $('ilTo').value=''; $('ilClient').value='';
+      renderInvoicesList();
+    });
+    body.querySelectorAll('.il-row').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if (e.target.closest('.client-link')) return; // let the client-name click open its own profile instead
+        const inv = invoices.find(i=>i.id===row.dataset.id);
+        if (inv){ showEditor(); openDocument(inv.id, 'invoice'); }
+      });
+    });
+  }
+
+  function populatePaymentModalDropdowns(currentlyLinkedInvoiceId){
     const acctSel = $('payAccount');
     acctSel.innerHTML = '<option value="">Unspecified</option>' +
       (company.bankAccounts||[]).map(a=>`<option value="${escapeAttr(a.id)}">${escapeAttr(a.label||a.bankName||'Account')}</option>`).join('');
 
+    // Invoices that are already fully paid have nothing left to attach a new
+    // payment to — leave them out, unless it's the invoice this particular
+    // payment is already linked to (so editing an existing payment never
+    // loses its own link). Unlinking or reducing another payment against
+    // that invoice will make it reappear here once it's outstanding again.
     const invSel = $('payInvoice');
-    const sortedInv = invoices.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    const sortedInv = invoices
+      .filter(i=>{
+        const outstanding = Math.max((i.total||0) - (parseFloat(i.amountPaid)||0), 0);
+        return outstanding > 0.004 || i.id === currentlyLinkedInvoiceId;
+      })
+      .sort((a,b)=> (b.date||'').localeCompare(a.date||''));
     invSel.innerHTML = '<option value="">Not linked to an invoice</option>' +
       sortedInv.map(i=>`<option value="${escapeAttr(i.id)}">${escapeAttr(i.number)} — ${escapeAttr(i.toName||'Untitled')}</option>`).join('');
 
@@ -1077,8 +1270,8 @@ window.storage = {
     dl.innerHTML = Array.from(names).sort().map(n=>`<option value="${escapeAttr(n)}"></option>`).join('');
   }
 
-  function openPaymentModal(payment){
-    populatePaymentModalDropdowns();
+  function openPaymentModal(payment, forceInvoiceId){
+    populatePaymentModalDropdowns(payment ? payment.invoiceId : forceInvoiceId);
     editingPaymentId = payment ? payment.id : null;
     $('paymentModalTitle').textContent = payment ? 'Edit payment' : 'Record a payment';
     $('payDate').value = payment ? payment.date : todayStr();
@@ -1257,6 +1450,229 @@ window.storage = {
     XLSX.writeFile(wb, 'payments-' + todayStr() + '.xlsx');
   }
 
+  function downloadInvoicesListExcel(rows){
+    if (typeof XLSX === 'undefined'){
+      toast('Still loading — try again in a moment');
+      return;
+    }
+    const cols = ['Number','Date','Due','Client','Status','Total','Received','Outstanding'];
+    const ws = {};
+    let r = 0;
+    const set = (c, cell) => { ws[XLSX.utils.encode_cell({r, c})] = cell; };
+
+    set(0, xlTitleCell(company.name || 'All Invoices'));
+    r++;
+    set(0, xlSubtitleCell(`Invoices report — generated ${todayStr()}`));
+    r++;
+    set(0, xlSubtitleCell(`${rows.length} invoice${rows.length===1?'':'s'}`));
+    r += 2;
+
+    const headerRow = r;
+    cols.forEach((c,i)=> set(i, xlHeaderCell(c)));
+    r++;
+
+    let totalAmt = 0, receivedAmt = 0, outstandingAmt = 0;
+    rows.forEach((inv, idx)=>{
+      const band = idx % 2 === 1;
+      const received = parseFloat(inv.amountPaid)||0;
+      const outstanding = Math.max((inv.total||0) - received, 0);
+      totalAmt += (inv.total||0); receivedAmt += received; outstandingAmt += outstanding;
+      const vals = [
+        inv.number || '', inv.date || '', inv.dueDate || '', inv.toName || '', inv.status || '',
+        inv.total || 0, received, outstanding
+      ];
+      vals.forEach((v,c)=> set(c, xlDataCell(v, { band, currency: c>=5 })));
+      r++;
+    });
+
+    set(0, xlTotalCell('TOTAL'));
+    for (let c=1;c<cols.length;c++){
+      if (c===5) set(c, xlTotalCell(totalAmt, {currency:true}));
+      else if (c===6) set(c, xlTotalCell(receivedAmt, {currency:true}));
+      else if (c===7) set(c, xlTotalCell(outstandingAmt, {currency:true}));
+      else set(c, xlTotalCell(''));
+    }
+    const totalRow = r;
+    r++;
+
+    ws['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:totalRow,c:cols.length-1} });
+    ws['!cols'] = [{wch:16},{wch:12},{wch:12},{wch:22},{wch:12},{wch:14},{wch:14},{wch:14}];
+    ws['!merges'] = [
+      { s:{r:0,c:0}, e:{r:0,c:cols.length-1} },
+      { s:{r:1,c:0}, e:{r:1,c:cols.length-1} },
+      { s:{r:2,c:0}, e:{r:2,c:cols.length-1} }
+    ];
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:headerRow,c:0}, e:{r:headerRow,c:cols.length-1} }) };
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Invoices');
+    XLSX.writeFile(wb, 'invoices-' + todayStr() + '.xlsx');
+  }
+
+  // ---------- REVENUE ----------
+  // Splits an invoice's total into what you actually earned (line items
+  // marked "Revenue") vs pass-through costs like official/USPTO fees (items
+  // left unmarked). Any discount is assumed to come out of revenue, since
+  // official fees are essentially never discountable in practice — matches
+  // how the discount itself is calculated (against discountable items only).
+  // Items saved before this feature existed have no isRevenue flag; treated
+  // as revenue by default so nothing old silently drops out of the report.
+  function computeInvoiceRevenueSplit(inv){
+    const items = inv.items || [];
+    const revenueBase = items.reduce((s,it)=> it.isRevenue !== false ? s + (parseFloat(it.price)||0)*(parseFloat(it.qty)||0) : s, 0);
+    const passThroughBase = items.reduce((s,it)=> it.isRevenue === false ? s + (parseFloat(it.price)||0)*(parseFloat(it.qty)||0) : s, 0);
+    let discountAmount = 0;
+    if (inv.discountEnabled && inv.discountValue > 0){
+      const discountableBase = items.reduce((s,it)=> it.discountable !== false ? s + (parseFloat(it.price)||0)*(parseFloat(it.qty)||0) : s, 0);
+      discountAmount = inv.discountType === 'percent' ? discountableBase * (inv.discountValue/100) : inv.discountValue;
+      discountAmount = Math.max(0, Math.min(discountAmount, discountableBase));
+    }
+    const revenue = Math.max(0, revenueBase - discountAmount);
+    return { revenue, passThrough: passThroughBase };
+  }
+
+  function renderRevenue(){
+    const body = $('revenueBody');
+    const currency = company.currency || '$';
+
+    if (invoices.length === 0){
+      body.innerHTML = `<div class="dashboard-empty">No invoices yet. Revenue will show up here once you've billed something.</div>`;
+      return;
+    }
+
+    const withSplit = invoices.map(inv => ({ inv, split: computeInvoiceRevenueSplit(inv) }));
+    const totalRevenue = withSplit.reduce((s,x)=> s + x.split.revenue, 0);
+    const totalPassThrough = withSplit.reduce((s,x)=> s + x.split.passThrough, 0);
+
+    const thisMonthKey = todayStr().slice(0,7);
+    const thisYearKey = todayStr().slice(0,4);
+    const monthRevenue = withSplit.filter(x=> (x.inv.date||'').slice(0,7) === thisMonthKey).reduce((s,x)=> s + x.split.revenue, 0);
+    const yearRevenue = withSplit.filter(x=> (x.inv.date||'').slice(0,4) === thisYearKey).reduce((s,x)=> s + x.split.revenue, 0);
+
+    const monthMap = {};
+    withSplit.forEach(({inv, split})=>{
+      const key = monthKey(inv.date);
+      if (!monthMap[key]) monthMap[key] = { key, label: monthLabel(inv.date), revenue:0, passThrough:0, count:0 };
+      monthMap[key].revenue += split.revenue;
+      monthMap[key].passThrough += split.passThrough;
+      monthMap[key].count += 1;
+    });
+    const monthRows = Object.values(monthMap).sort((a,b)=> b.key.localeCompare(a.key));
+
+    body.innerHTML = `
+      <div class="payments-toolbar">
+        <div></div>
+        <button class="btn" id="downloadRevenueBtn">⬇ Download Excel</button>
+      </div>
+
+      <div class="money-panel" style="margin-bottom:22px;">
+        <div class="money-card">
+          <div class="money-label">Revenue this month</div>
+          <div class="money-num">${currency}${money(monthRevenue)}</div>
+        </div>
+        <div class="money-card alt">
+          <div class="money-label">Revenue this year</div>
+          <div class="money-num">${currency}${money(yearRevenue)}</div>
+        </div>
+        <div class="money-card alt">
+          <div class="money-label">Revenue all time</div>
+          <div class="money-num">${currency}${money(totalRevenue)}</div>
+        </div>
+      </div>
+
+      <div class="account-split-grid" style="margin-bottom:28px;">
+        <div class="account-split-card">
+          <div class="as-label">Total invoiced (all time)</div>
+          <div class="as-num">${currency}${money(totalRevenue + totalPassThrough)}</div>
+        </div>
+        <div class="account-split-card">
+          <div class="as-label">Official / pass-through fees (excluded above)</div>
+          <div class="as-num">${currency}${money(totalPassThrough)}</div>
+        </div>
+      </div>
+
+      <div class="breakdown-title">Month by month</div>
+      <div class="payments-table-wrap">
+        <table class="payments-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th style="text-align:right;">Invoices</th>
+              <th style="text-align:right;">Revenue</th>
+              <th style="text-align:right;">Pass-through fees</th>
+              <th style="text-align:right;">Total invoiced</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${monthRows.map(m=>`
+              <tr>
+                <td>${escapeAttr(m.label)}</td>
+                <td class="pt-amt">${m.count}</td>
+                <td class="pt-amt">${currency}${money(m.revenue)}</td>
+                <td class="pt-amt">${currency}${money(m.passThrough)}</td>
+                <td class="pt-amt">${currency}${money(m.revenue + m.passThrough)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    $('downloadRevenueBtn').addEventListener('click', ()=>downloadRevenueExcel(monthRows));
+  }
+
+  function downloadRevenueExcel(monthRows){
+    if (typeof XLSX === 'undefined'){
+      toast('Still loading — try again in a moment');
+      return;
+    }
+    const cols = ['Month','Invoices','Revenue','Pass-through fees','Total invoiced'];
+    const ws = {};
+    let r = 0;
+    const set = (c, cell) => { ws[XLSX.utils.encode_cell({r, c})] = cell; };
+
+    set(0, xlTitleCell(company.name || 'Revenue'));
+    r++;
+    set(0, xlSubtitleCell(`Month-by-month revenue — generated ${todayStr()}`));
+    r++;
+    set(0, xlSubtitleCell('Official/pass-through fees are broken out separately, not counted as revenue'));
+    r += 2;
+
+    const headerRow = r;
+    cols.forEach((c,i)=> set(i, xlHeaderCell(c)));
+    r++;
+
+    let totalRevenue = 0, totalPassThrough = 0, totalInvoices = 0;
+    monthRows.forEach((m, idx)=>{
+      const band = idx % 2 === 1;
+      totalRevenue += m.revenue; totalPassThrough += m.passThrough; totalInvoices += m.count;
+      const vals = [m.label, m.count, m.revenue, m.passThrough, m.revenue + m.passThrough];
+      vals.forEach((v,c)=> set(c, xlDataCell(v, { band, currency: c>=2 })));
+      r++;
+    });
+
+    set(0, xlTotalCell('TOTAL'));
+    set(1, xlTotalCell(totalInvoices));
+    set(2, xlTotalCell(totalRevenue, {currency:true}));
+    set(3, xlTotalCell(totalPassThrough, {currency:true}));
+    set(4, xlTotalCell(totalRevenue + totalPassThrough, {currency:true}));
+    const totalRow = r;
+    r++;
+
+    ws['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:totalRow,c:cols.length-1} });
+    ws['!cols'] = [{wch:14},{wch:11},{wch:14},{wch:18},{wch:16}];
+    ws['!merges'] = [
+      { s:{r:0,c:0}, e:{r:0,c:cols.length-1} },
+      { s:{r:1,c:0}, e:{r:1,c:cols.length-1} },
+      { s:{r:2,c:0}, e:{r:2,c:cols.length-1} }
+    ];
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s:{r:headerRow,c:0}, e:{r:headerRow,c:cols.length-1} }) };
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Revenue');
+    XLSX.writeFile(wb, 'revenue-by-month-' + todayStr() + '.xlsx');
+  }
+
   // ---------- CLIENT PROFILE ----------
   function openClientProfile(name){
     if (!name) return;
@@ -1335,7 +1751,7 @@ window.storage = {
     const sorted = services.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
     container.innerHTML = sorted.map(s => `
       <div class="service-row" data-id="${escapeAttr(s.id)}">
-        <span class="sv-name">${escapeAttr(s.name)}</span>
+        <span class="sv-name">${escapeAttr(s.name)} ${s.isRevenue === false ? '<span class="account-tag unspecified">Pass-through</span>' : '<span class="account-tag">Revenue</span>'}</span>
         <span class="sv-price">${currency}${money(s.price)}</span>
         <button class="remove-link sv-remove" data-id="${escapeAttr(s.id)}" type="button">Remove</button>
       </div>
@@ -1354,6 +1770,7 @@ window.storage = {
     renderServicesModal();
     $('newServiceName').value = '';
     $('newServicePrice').value = '';
+    $('newServiceIsRevenue').checked = true;
     $('servicesModalOverlay').classList.add('show');
   }
   function closeServicesModal(){ $('servicesModalOverlay').classList.remove('show'); }
@@ -1363,10 +1780,11 @@ window.storage = {
     const price = parseFloat($('newServicePrice').value);
     if (!name){ toast('Enter a service name'); return; }
     if (!price || price <= 0){ toast('Enter a valid price'); return; }
-    services.push({ id: uid(), name, price });
+    services.push({ id: uid(), name, price, isRevenue: $('newServiceIsRevenue').checked });
     await persistServices();
     $('newServiceName').value = '';
     $('newServicePrice').value = '';
+    $('newServiceIsRevenue').checked = true;
     renderServicesModal();
     renderServicePicker();
     toast('Service saved');
@@ -1897,7 +2315,7 @@ window.storage = {
   }
 
   // ---------- LINE ITEMS ----------
-  function newItem(){ return {id:uid(), desc:'', price:0, qty:1, discountable:true}; }
+  function newItem(){ return {id:uid(), desc:'', price:0, qty:1, discountable:true, isRevenue:true}; }
 
   // Removes rows that were added but never actually filled in (no description
   // and no price), so blank placeholder rows don't get saved or printed as
@@ -1924,6 +2342,9 @@ window.storage = {
         <td><input type="number" class="num" value="${it.price}" min="0" step="0.01" data-field="price" data-id="${it.id}"></td>
         <td><input type="number" class="num" value="${it.qty}" min="0" step="1" data-field="qty" data-id="${it.id}"></td>
         <td class="amount-cell">${money(amount)}</td>
+        <td class="no-print" style="text-align:center;">
+          <input type="checkbox" class="item-revenue-check" data-id="${it.id}" ${it.isRevenue !== false ? 'checked' : ''} title="Counts toward your revenue reports">
+        </td>
         <td class="discount-col no-print" style="text-align:center;">
           <input type="checkbox" class="item-discount-check" data-id="${it.id}" ${it.discountable !== false ? 'checked' : ''} title="Eligible for discount">
         </td>
@@ -1936,6 +2357,12 @@ window.storage = {
       chk.addEventListener('change', ()=>{
         const it = items.find(i=>i.id===chk.dataset.id);
         if (it){ it.discountable = chk.checked; recalcTotals(); }
+      });
+    });
+    body.querySelectorAll('.item-revenue-check').forEach(chk=>{
+      chk.addEventListener('change', ()=>{
+        const it = items.find(i=>i.id===chk.dataset.id);
+        if (it){ it.isRevenue = chk.checked; }
       });
     });
     body.querySelectorAll('textarea.desc-field').forEach(ta=>{
@@ -2494,6 +2921,8 @@ window.storage = {
   $('newEstimateBtn').addEventListener('click', ()=>{ showEditor(); newDocument('estimate'); });
   $('homeBtn').addEventListener('click', showDashboard);
   $('paymentsBtn').addEventListener('click', showPayments);
+  $('invoicesListBtn').addEventListener('click', showInvoicesList);
+  $('revenueBtn').addEventListener('click', showRevenue);
   $('saveBtn').addEventListener('click', saveDocument);
   $('deleteBtn').addEventListener('click', deleteDocument);
   $('duplicateBtn').addEventListener('click', duplicateDocument);
@@ -2535,7 +2964,7 @@ window.storage = {
     if (!id) return;
     const svc = services.find(s=>s.id===id);
     if (svc){
-      items.push({ id: uid(), desc: svc.name, price: svc.price, qty: 1 });
+      items.push({ id: uid(), desc: svc.name, price: svc.price, qty: 1, discountable: true, isRevenue: svc.isRevenue !== false });
       renderItems();
       recalcTotals();
     }
@@ -2571,11 +3000,35 @@ window.storage = {
     const totals = recalcTotals();
     const alreadyPaid = parseFloat($('amountPaidField').value)||0;
     const remaining = Math.max(totals.total - alreadyPaid, 0);
-    openPaymentModal(null);
+    openPaymentModal(null, currentId);
     $('payClient').value = $('toName').value || '';
     $('payAmount').value = (remaining > 0 ? remaining : totals.total).toFixed(2);
     $('payAccount').value = currentBankAccountId || company.defaultBankAccountId || '';
     $('payInvoice').value = currentId;
+  });
+
+  // If "Received" is raised by hand past what's actually on record as
+  // payments for this invoice, offer to log the difference as a real
+  // payment right away — so every dollar marked received has an actual
+  // payment behind it, tagged to a bank account.
+  $('amountPaidField').addEventListener('change', ()=>{
+    if (docType !== 'invoice' || !currentId) return;
+    const currency = company.currency || '$';
+    const typedAmount = parseFloat($('amountPaidField').value)||0;
+    const linkedSum = payments.filter(p=>p.invoiceId===currentId).reduce((s,p)=> s+(parseFloat(p.amount)||0), 0);
+    const delta = typedAmount - linkedSum;
+    if (delta > 0.004){
+      const wantsToRecord = confirm(
+        `You've marked ${currency}${money(typedAmount)} as received, but only ${currency}${money(linkedSum)} is on record as an actual payment.\n\nRecord the remaining ${currency}${money(delta)} as a payment now?`
+      );
+      if (wantsToRecord){
+        openPaymentModal(null, currentId);
+        $('payClient').value = $('toName').value || '';
+        $('payAmount').value = delta.toFixed(2);
+        $('payAccount').value = currentBankAccountId || company.defaultBankAccountId || '';
+        $('payInvoice').value = currentId;
+      }
+    }
   });
 
   $('cancelPaymentModal').addEventListener('click', closePaymentModal);

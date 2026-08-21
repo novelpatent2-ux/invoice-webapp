@@ -1536,21 +1536,34 @@ window.storage = {
   // computeInvoiceRevenueSplit). A payment not linked to any invoice (or
   // linked to one that's since been deleted, or has a zero total) has no
   // line-item detail to split by, so it's counted fully as revenue.
+  // Splits a single payment into revenue vs official/pass-through fees using
+  // a waterfall, not a flat ratio — in real practice, clients pay the
+  // professional fee first, and the official/USPTO fee typically lands with
+  // the last payment near filing. So payments are applied in date order
+  // against the invoice's professional-fee "bucket" first; only once that
+  // bucket is full does the remainder of a later payment count as an
+  // official/pass-through fee. A payment not linked to any invoice (or one
+  // that's since been deleted, or has a zero total) has no detail to split
+  // by, so it's counted fully as revenue.
   function computePaymentRevenueSplit(p){
     const amount = parseFloat(p.amount)||0;
     if (p.invoiceId){
       const inv = invoices.find(i=>i.id===p.invoiceId);
       if (inv){
         const split = computeInvoiceRevenueSplit(inv);
-        const invoiceNetTotal = split.revenue + split.passThrough;
-        if (invoiceNetTotal > 0.004){
-          const revenueRatio = split.revenue / invoiceNetTotal;
-          const proFeeRatio = Math.min(1, split.professionalFee / invoiceNetTotal);
-          return {
-            revenue: amount * revenueRatio,
-            passThrough: amount * (1 - revenueRatio),
-            professionalFee: amount * proFeeRatio
-          };
+        const professionalFeeCap = split.revenue; // net of discount — the actual dollar ceiling for "professional fee" money
+        const linkedPayments = payments
+          .filter(pp => pp.invoiceId === inv.id)
+          .sort((a,b)=> (a.date||'').localeCompare(b.date||'') || (a.createdAt||0)-(b.createdAt||0));
+        let runningTotal = 0;
+        for (const lp of linkedPayments){
+          const lpAmount = parseFloat(lp.amount)||0;
+          if (lp.id === p.id){
+            const revenuePortion = Math.max(0, Math.min(lpAmount, professionalFeeCap - runningTotal));
+            const passThroughPortion = lpAmount - revenuePortion;
+            return { revenue: revenuePortion, passThrough: passThroughPortion, professionalFee: revenuePortion };
+          }
+          runningTotal += lpAmount;
         }
       }
     }

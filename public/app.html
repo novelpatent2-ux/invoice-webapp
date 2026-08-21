@@ -1551,19 +1551,25 @@ window.storage = {
       const inv = invoices.find(i=>i.id===p.invoiceId);
       if (inv){
         const split = computeInvoiceRevenueSplit(inv);
-        const professionalFeeCap = split.revenue; // net of discount — the actual dollar ceiling for "professional fee" money
+        const professionalFeeCap = split.revenue;    // net of discount — dollar ceiling for "professional fee" money
+        const passThroughCap = split.passThrough;    // dollar ceiling for official/USPTO fee money — an invoice with none of these has a cap of $0
         const linkedPayments = payments
           .filter(pp => pp.invoiceId === inv.id)
           .sort((a,b)=> (a.date||'').localeCompare(b.date||'') || (a.createdAt||0)-(b.createdAt||0));
-        let runningTotal = 0;
+        let runningProFilled = 0, runningPassFilled = 0;
         for (const lp of linkedPayments){
           const lpAmount = parseFloat(lp.amount)||0;
+          const proRoom = Math.max(0, professionalFeeCap - runningProFilled);
+          const proPortion = Math.min(lpAmount, proRoom);
+          const afterPro = lpAmount - proPortion;
+          const passRoom = Math.max(0, passThroughCap - runningPassFilled);
+          const passPortion = Math.min(afterPro, passRoom);
+          const overpaymentBeyondInvoice = afterPro - passPortion; // e.g. a wire fee tacked on — not a government fee, so it's just extra revenue
           if (lp.id === p.id){
-            const revenuePortion = Math.max(0, Math.min(lpAmount, professionalFeeCap - runningTotal));
-            const passThroughPortion = lpAmount - revenuePortion;
-            return { revenue: revenuePortion, passThrough: passThroughPortion, professionalFee: revenuePortion };
+            return { revenue: proPortion + overpaymentBeyondInvoice, passThrough: passPortion, professionalFee: proPortion + overpaymentBeyondInvoice };
           }
-          runningTotal += lpAmount;
+          runningProFilled += proPortion;
+          runningPassFilled += passPortion;
         }
       }
     }

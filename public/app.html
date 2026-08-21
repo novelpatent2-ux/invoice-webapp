@@ -1531,28 +1531,54 @@ window.storage = {
     return { revenue, passThrough: passThroughBase, professionalFee: revenueBase, discountAmount };
   }
 
+  // Splits a single payment's amount into revenue vs official/pass-through
+  // fees, prorated using its linked invoice's own revenue-vs-fee mix (see
+  // computeInvoiceRevenueSplit). A payment not linked to any invoice (or
+  // linked to one that's since been deleted, or has a zero total) has no
+  // line-item detail to split by, so it's counted fully as revenue.
+  function computePaymentRevenueSplit(p){
+    const amount = parseFloat(p.amount)||0;
+    if (p.invoiceId){
+      const inv = invoices.find(i=>i.id===p.invoiceId);
+      if (inv){
+        const split = computeInvoiceRevenueSplit(inv);
+        const invoiceNetTotal = split.revenue + split.passThrough;
+        if (invoiceNetTotal > 0.004){
+          const revenueRatio = split.revenue / invoiceNetTotal;
+          const proFeeRatio = Math.min(1, split.professionalFee / invoiceNetTotal);
+          return {
+            revenue: amount * revenueRatio,
+            passThrough: amount * (1 - revenueRatio),
+            professionalFee: amount * proFeeRatio
+          };
+        }
+      }
+    }
+    return { revenue: amount, passThrough: 0, professionalFee: amount };
+  }
+
   function renderRevenue(){
     const body = $('revenueBody');
     const currency = company.currency || '$';
 
-    if (invoices.length === 0){
-      body.innerHTML = `<div class="dashboard-empty">No invoices yet. Revenue will show up here once you've billed something.</div>`;
+    if (payments.length === 0){
+      body.innerHTML = `<div class="dashboard-empty">No payments recorded yet. Revenue is based on money actually received, so it'll show up here once a payment is logged.</div>`;
       return;
     }
 
-    const withSplit = invoices.map(inv => ({ inv, split: computeInvoiceRevenueSplit(inv) }));
+    const withSplit = payments.map(p => ({ p, split: computePaymentRevenueSplit(p) }));
     const totalRevenue = withSplit.reduce((s,x)=> s + x.split.revenue, 0);
     const totalPassThrough = withSplit.reduce((s,x)=> s + x.split.passThrough, 0);
 
     const thisMonthKey = todayStr().slice(0,7);
     const thisYearKey = todayStr().slice(0,4);
-    const monthRevenue = withSplit.filter(x=> (x.inv.date||'').slice(0,7) === thisMonthKey).reduce((s,x)=> s + x.split.revenue, 0);
-    const yearRevenue = withSplit.filter(x=> (x.inv.date||'').slice(0,4) === thisYearKey).reduce((s,x)=> s + x.split.revenue, 0);
+    const monthRevenue = withSplit.filter(x=> (x.p.date||'').slice(0,7) === thisMonthKey).reduce((s,x)=> s + x.split.revenue, 0);
+    const yearRevenue = withSplit.filter(x=> (x.p.date||'').slice(0,4) === thisYearKey).reduce((s,x)=> s + x.split.revenue, 0);
 
     const monthMap = {};
-    withSplit.forEach(({inv, split})=>{
-      const key = monthKey(inv.date);
-      if (!monthMap[key]) monthMap[key] = { key, label: monthLabel(inv.date), revenue:0, passThrough:0, count:0 };
+    withSplit.forEach(({p, split})=>{
+      const key = monthKey(p.date);
+      if (!monthMap[key]) monthMap[key] = { key, label: monthLabel(p.date), revenue:0, passThrough:0, count:0 };
       monthMap[key].revenue += split.revenue;
       monthMap[key].passThrough += split.passThrough;
       monthMap[key].count += 1;
@@ -1572,29 +1598,31 @@ window.storage = {
 
       <div class="money-panel" style="margin-bottom:22px;">
         <div class="money-card">
-          <div class="money-label">Revenue this month</div>
+          <div class="money-label">Revenue received this month</div>
           <div class="money-num">${currency}${money(monthRevenue)}</div>
         </div>
         <div class="money-card alt">
-          <div class="money-label">Revenue this year</div>
+          <div class="money-label">Revenue received this year</div>
           <div class="money-num">${currency}${money(yearRevenue)}</div>
         </div>
         <div class="money-card alt">
-          <div class="money-label">Revenue all time</div>
+          <div class="money-label">Revenue received all time</div>
           <div class="money-num">${currency}${money(totalRevenue)}</div>
         </div>
       </div>
 
       <div class="account-split-grid" style="margin-bottom:28px;">
         <div class="account-split-card">
-          <div class="as-label">Total invoiced (all time)</div>
+          <div class="as-label">Total received (all time)</div>
           <div class="as-num">${currency}${money(totalRevenue + totalPassThrough)}</div>
         </div>
         <div class="account-split-card">
-          <div class="as-label">Official / pass-through fees (excluded above)</div>
+          <div class="as-label">Official / pass-through fees received (excluded above)</div>
           <div class="as-num">${currency}${money(totalPassThrough)}</div>
         </div>
       </div>
+
+      <p class="hint" style="margin:-14px 0 20px;">Based on payments received, split using each linked invoice's revenue-vs-official-fee mix. Payments not linked to an invoice (including historical imports) are counted fully as revenue, since there's no line-item detail to split them by.</p>
 
       <div class="breakdown-title">Month by month</div>
       <div class="payments-table-wrap">
@@ -1602,10 +1630,10 @@ window.storage = {
           <thead>
             <tr>
               <th>Month</th>
-              <th style="text-align:right;">Invoices</th>
+              <th style="text-align:right;">Payments</th>
               <th style="text-align:right;">Revenue</th>
               <th style="text-align:right;">Pass-through fees</th>
-              <th style="text-align:right;">Total invoiced</th>
+              <th style="text-align:right;">Total received</th>
             </tr>
           </thead>
           <tbody>
@@ -1634,14 +1662,14 @@ window.storage = {
       toast('Still loading — try again in a moment');
       return;
     }
-    const cols = ['Month','Invoices','Revenue','Pass-through fees','Total invoiced'];
+    const cols = ['Month','Payments','Revenue','Pass-through fees','Total received'];
     const ws = {};
     let r = 0;
     const set = (c, cell) => { ws[XLSX.utils.encode_cell({r, c})] = cell; };
 
     set(0, xlTitleCell(company.name || 'Revenue'));
     r++;
-    set(0, xlSubtitleCell(`Month-by-month revenue — generated ${todayStr()}`));
+    set(0, xlSubtitleCell(`Month-by-month revenue (based on payments received) — generated ${todayStr()}`));
     r++;
     set(0, xlSubtitleCell('Official/pass-through fees are broken out separately, not counted as revenue'));
     r += 2;
@@ -1650,17 +1678,17 @@ window.storage = {
     cols.forEach((c,i)=> set(i, xlHeaderCell(c)));
     r++;
 
-    let totalRevenue = 0, totalPassThrough = 0, totalInvoices = 0;
+    let totalRevenue = 0, totalPassThrough = 0, totalPayments = 0;
     monthRows.forEach((m, idx)=>{
       const band = idx % 2 === 1;
-      totalRevenue += m.revenue; totalPassThrough += m.passThrough; totalInvoices += m.count;
+      totalRevenue += m.revenue; totalPassThrough += m.passThrough; totalPayments += m.count;
       const vals = [m.label, m.count, m.revenue, m.passThrough, m.revenue + m.passThrough];
       vals.forEach((v,c)=> set(c, xlDataCell(v, { band, currency: c>=2 })));
       r++;
     });
 
     set(0, xlTotalCell('TOTAL'));
-    set(1, xlTotalCell(totalInvoices));
+    set(1, xlTotalCell(totalPayments));
     set(2, xlTotalCell(totalRevenue, {currency:true}));
     set(3, xlTotalCell(totalPassThrough, {currency:true}));
     set(4, xlTotalCell(totalRevenue + totalPassThrough, {currency:true}));
@@ -1681,46 +1709,49 @@ window.storage = {
     XLSX.writeFile(wb, 'revenue-by-month-' + todayStr() + '.xlsx');
   }
 
-  // Full per-invoice breakdown for one month: client, total, official/USPTO
-  // fees, gross professional fee (before discount), and actual revenue
-  // (after discount) — so you can see exactly how a discount ate into what
-  // you kept, invoice by invoice, not just the month's overall total.
+  // Full per-payment breakdown for one month: which client paid, how much,
+  // which invoice it went toward, and the official-fee vs professional-fee
+  // vs revenue split for that specific payment (prorated from its linked
+  // invoice's own mix). Payments not linked to an invoice show entirely
+  // under Revenue, since there's nothing to split them by.
   function downloadRevenueMonthDetailExcel(monthKeyVal, withSplit){
     if (typeof XLSX === 'undefined'){
       toast('Still loading — try again in a moment');
       return;
     }
     const rows = withSplit
-      .filter(x => monthKey(x.inv.date) === monthKeyVal)
-      .sort((a,b)=> (a.inv.date||'').localeCompare(b.inv.date||'') || (a.inv.number||'').localeCompare(b.inv.number||''));
-    const label = rows.length ? monthLabel(rows[0].inv.date) : monthKeyVal;
+      .filter(x => monthKey(x.p.date) === monthKeyVal)
+      .sort((a,b)=> (a.p.date||'').localeCompare(b.p.date||''));
+    const label = rows.length ? monthLabel(rows[0].p.date) : monthKeyVal;
 
-    const cols = ['Invoice #','Date','Client','Total Invoice Value','USPTO / Official Fees','Professional Fee','Revenue'];
+    const cols = ['Date','Client','Linked Invoice #','Amount Received','USPTO / Official Fees','Professional Fee','Revenue'];
     const ws = {};
     let r = 0;
     const set = (c, cell) => { ws[XLSX.utils.encode_cell({r, c})] = cell; };
 
     set(0, xlTitleCell(company.name || 'Revenue Detail'));
     r++;
-    set(0, xlSubtitleCell(`Revenue detail — ${label} — generated ${todayStr()}`));
+    set(0, xlSubtitleCell(`Revenue detail (payments received) — ${label} — generated ${todayStr()}`));
     r++;
-    set(0, xlSubtitleCell(`${rows.length} invoice${rows.length===1?'':'s'}`));
+    set(0, xlSubtitleCell(`${rows.length} payment${rows.length===1?'':'s'}`));
     r += 2;
 
     const headerRow = r;
     cols.forEach((c,i)=> set(i, xlHeaderCell(c)));
     r++;
 
-    let totalInvoiceVal=0, totalUSPTO=0, totalProFee=0, totalRevenue=0;
-    rows.forEach(({inv, split}, idx)=>{
+    let totalAmt=0, totalUSPTO=0, totalProFee=0, totalRevenue=0;
+    rows.forEach(({p, split}, idx)=>{
       const band = idx % 2 === 1;
-      totalInvoiceVal += (inv.total||0);
+      const amount = parseFloat(p.amount)||0;
+      const linkedInv = p.invoiceId ? (invoices.find(i=>i.id===p.invoiceId)||{}).number : '';
+      totalAmt += amount;
       totalUSPTO += split.passThrough;
       totalProFee += split.professionalFee;
       totalRevenue += split.revenue;
       const vals = [
-        inv.number || '', inv.date || '', inv.toName || '',
-        inv.total || 0, split.passThrough, split.professionalFee, split.revenue
+        p.date || '', p.client || '', linkedInv || '—',
+        amount, split.passThrough, split.professionalFee, split.revenue
       ];
       vals.forEach((v,c)=> set(c, xlDataCell(v, { band, currency: c>=3 })));
       r++;
@@ -1728,7 +1759,7 @@ window.storage = {
 
     set(0, xlTotalCell('TOTAL'));
     for (let c=1;c<cols.length;c++){
-      if (c===3) set(c, xlTotalCell(totalInvoiceVal, {currency:true}));
+      if (c===3) set(c, xlTotalCell(totalAmt, {currency:true}));
       else if (c===4) set(c, xlTotalCell(totalUSPTO, {currency:true}));
       else if (c===5) set(c, xlTotalCell(totalProFee, {currency:true}));
       else if (c===6) set(c, xlTotalCell(totalRevenue, {currency:true}));
@@ -1738,7 +1769,7 @@ window.storage = {
     r++;
 
     ws['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:totalRow,c:cols.length-1} });
-    ws['!cols'] = [{wch:14},{wch:12},{wch:24},{wch:18},{wch:18},{wch:16},{wch:14}];
+    ws['!cols'] = [{wch:12},{wch:24},{wch:16},{wch:16},{wch:18},{wch:16},{wch:14}];
     ws['!merges'] = [
       { s:{r:0,c:0}, e:{r:0,c:cols.length-1} },
       { s:{r:1,c:0}, e:{r:1,c:cols.length-1} },

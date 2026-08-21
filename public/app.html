@@ -700,8 +700,12 @@
     <button class="upload-btn" id="addBankAccountBtn" type="button" style="margin-bottom:16px;">+ Add bank account</button>
 
     <h3>Backup</h3>
-    <p class="hint" style="margin-top:-6px;">Download everything — invoices, estimates, clients, and payments — as a single file you can keep somewhere safe. Not automatic; run it whenever you want a fresh copy.</p>
-    <button class="upload-btn" id="downloadBackupBtn" type="button" style="margin-bottom:16px;">⬇ Download full backup</button>
+    <p class="hint" style="margin-top:-6px;">Download everything — invoices, estimates, clients, services, and payments — as a single file you can keep somewhere safe. Not automatic; run it whenever you want a fresh copy.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="upload-btn" id="downloadBackupBtn" type="button" style="margin-bottom:0;">⬇ Download full backup</button>
+      <button class="upload-btn" id="restoreBackupBtn" type="button" style="margin-bottom:0;color:#A13D2C;border-color:#E3B7AC;">⬆ Restore from backup</button>
+      <input type="file" id="restoreBackupFileInput" accept="application/json,.json" style="display:none;">
+    </div>
 
     <div class="modal-actions">
       <button class="btn" id="cancelCompanyModal">Cancel</button>
@@ -1982,7 +1986,7 @@ window.storage = {
   function downloadFullBackup(){
     const backup = {
       exportedAt: new Date().toISOString(),
-      company, invoices, estimates, clients, payments
+      company, invoices, estimates, clients, payments, services
     };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1994,6 +1998,112 @@ window.storage = {
     a.remove();
     URL.revokeObjectURL(url);
     toast('Backup downloaded');
+  }
+
+  // ---------- RESTORE FROM BACKUP ----------
+  // Restoring REPLACES everything currently in the app with whatever is in
+  // the chosen file. That's a genuinely destructive action, so this is
+  // deliberately cautious:
+  //   1. The file is validated before anything happens — bad/unrecognized
+  //      JSON is rejected with nothing touched.
+  //   2. The person sees exactly what's in the backup (counts + date) and
+  //      must explicitly confirm before anything changes.
+  //   3. Right before applying it, the CURRENT data is auto-downloaded as
+  //      its own timestamped backup — so even a restore the person regrets
+  //      immediately after is recoverable, without them having to have
+  //      remembered to do that themselves first.
+  function validateBackupShape(obj){
+    if (!obj || typeof obj !== 'object') return 'This file is not valid JSON.';
+    if (!obj.company || typeof obj.company !== 'object') return 'This file is missing company details — it doesn\'t look like a backup from this app.';
+    for (const key of ['invoices','estimates','clients','payments']){
+      if (!Array.isArray(obj[key])) return `This file is missing "${key}" — it doesn't look like a backup from this app.`;
+    }
+    return null; // valid
+  }
+
+  function openRestoreFilePicker(){
+    $('restoreBackupFileInput').value = ''; // allow re-choosing the same file twice in a row
+    $('restoreBackupFileInput').click();
+  }
+
+  async function handleRestoreFileChosen(e){
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    let parsed;
+    try{
+      const text = await file.text();
+      parsed = JSON.parse(text);
+    }catch(err){
+      alert('Could not read this file — it doesn\'t look like valid JSON. Nothing has been changed.');
+      return;
+    }
+
+    const problem = validateBackupShape(parsed);
+    if (problem){
+      alert(problem + '\n\nNothing has been changed.');
+      return;
+    }
+
+    const svc = Array.isArray(parsed.services) ? parsed.services : [];
+    const dateStr = parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString() : 'an unknown date';
+    const summary =
+      `This backup was created on ${dateStr} and contains:\n\n` +
+      `${parsed.invoices.length} invoice(s)\n` +
+      `${parsed.estimates.length} estimate(s)\n` +
+      `${parsed.clients.length} client(s)\n` +
+      `${parsed.payments.length} payment(s)\n` +
+      `${svc.length} saved service(s)\n\n` +
+      `Restoring will REPLACE everything currently in the app with this data. ` +
+      `Your current data will be downloaded as a safety backup first, just in case.\n\n` +
+      `Continue with the restore?`;
+
+    if (!confirm(summary)) return;
+
+    // Safety net: save what's currently here before touching anything.
+    const safetyBackup = {
+      exportedAt: new Date().toISOString(),
+      note: 'Auto-saved automatically right before a restore was applied.',
+      company, invoices, estimates, clients, payments, services
+    };
+    const blob = new Blob([JSON.stringify(safetyBackup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoice-backup-before-restore-${todayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    // Apply the restore.
+    company = parsed.company;
+    invoices = parsed.invoices;
+    estimates = parsed.estimates;
+    clients = parsed.clients;
+    payments = parsed.payments;
+    services = svc;
+    if (!company.bankAccounts || !company.bankAccounts.length){
+      company.bankAccounts = [{ id:'acct_'+Date.now(), label:'Primary Account', accountName:'', bankName:'', routing:'', accountNum:'', accountType:'', swift:'', mailing:'', zelle:'' }];
+      company.defaultBankAccountId = company.bankAccounts[0].id;
+    }
+
+    try{
+      await persistCompany();
+      await persistInvoices();
+      await persistEstimates();
+      await persistClients();
+      await persistPayments();
+      await persistServices();
+    }catch(err){
+      alert('The restore finished loading in the app, but saving it to the server failed. Please try again, or check your connection.');
+    }
+
+    closeCompanyModal();
+    renderBrand();
+    renderServicePicker();
+    showDashboard();
+    toast('Backup restored');
   }
 
   // ---------- PAYMENT <-> INVOICE SYNC ----------
@@ -3165,6 +3275,8 @@ window.storage = {
   $('paymentModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='paymentModalOverlay') closePaymentModal(); });
 
   $('downloadBackupBtn').addEventListener('click', downloadFullBackup);
+  $('restoreBackupBtn').addEventListener('click', openRestoreFilePicker);
+  $('restoreBackupFileInput').addEventListener('change', handleRestoreFileChosen);
 
   $('closeClientProfileBtn').addEventListener('click', closeClientProfile);
   $('clientProfileModalOverlay').addEventListener('click', (e)=>{ if (e.target.id==='clientProfileModalOverlay') closeClientProfile(); });
